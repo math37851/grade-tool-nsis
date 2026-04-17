@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أداة رصد الدرجات - قسم الرياضيات</title>
+
+<style>
+  @font-face {
+    font-family: 'Lusail+';
+    src: url('Lusail-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Lusail+';
+    src: url('Lusail-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Lusail+';
+    src: url('Lusail-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Lusail+';
+    src: url('Lusail-Extrabold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --primary: #8B1A32;
+    --primary-dark: #6D1D2A;
+    --primary-light: #fce4ec;
+    --success: #2e7d32;
+    --success-light: #e8f5e9;
+    --warning: #e65100;
+    --warning-light: #fff8e1;
+    --danger: #c62828;
+    --danger-light: #ffebee;
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #eeeeee;
+    --gray-300: #e0e0e0;
+    --gray-500: #9e9e9e;
+    --gray-700: #616161;
+    --gray-900: #212121;
+    --radius: 14px;
+    --shadow: 0 20px 60px rgba(0,0,0,0.15);
+    --shadow-lg: 0 25px 80px rgba(0,0,0,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Lusail+', 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #1a0a10 0%, #3d0f1e 30%, #6D1D2A 60%, #8B1A32 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  body::before, body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  body::before {
+    width: 400px; height: 400px;
+    background: #e57373;
+    top: -100px; right: -100px;
+  }
+  body::after {
+    width: 300px; height: 300px;
+    background: #ce93d8;
+    bottom: -50px; left: -50px;
+    animation-delay: 4s;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, 20px) scale(1.1); }
+  }
+
+  .container {
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 680px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.6s ease-out;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .school-banner {
+    background: white;
+    padding: 14px 20px;
+    text-align: center;
+    border-bottom: 2px solid #8B1A32;
+  }
+  .school-banner img {
+    max-width: 100%;
+    height: auto;
+    max-height: 70px;
+    object-fit: contain;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #8B1A32 0%, #6D1D2A 50%, #8B1A32 100%);
+    color: white;
+    padding: 28px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60%; left: -15%;
+    width: 180px; height: 180px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header .logo {
+    font-size: 48px;
+    margin-bottom: 6px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .header p { font-size: 14px; opacity: 0.85; font-weight: 400; }
+  .header .dept-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* Trial banner */
+  .trial-banner {
+    background: linear-gradient(90deg, #ff8f00, #f57c00);
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    display: none;
+  }
+  .trial-banner .days {
+    display: inline-block;
+    background: rgba(0,0,0,0.2);
+    padding: 2px 10px;
+    border-radius: 10px;
+    margin: 0 4px;
+  }
+  .trial-progress {
+    height: 3px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .trial-progress .fill {
+    height: 100%;
+    background: white;
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+
+  /* Activation overlay */
+  .activation-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(10,5,8,0.95);
+    backdrop-filter: blur(15px);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.5s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .activation-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    animation: slideUp 0.6s ease-out;
+  }
+  .activation-card .lock-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: shake 2s ease-in-out infinite;
+  }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    10% { transform: rotate(-5deg); }
+    20% { transform: rotate(5deg); }
+    30% { transform: rotate(0deg); }
+  }
+  .activation-card h2 {
+    color: var(--primary-dark);
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .activation-card p {
+    color: var(--gray-700);
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+  .activation-input-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .activation-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 3px;
+    border: 2px solid var(--gray-300);
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    direction: ltr;
+  }
+  .activation-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(139,26,50,0.1);
+  }
+  .activation-input.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 4px rgba(198,40,40,0.1);
+    animation: inputShake 0.4s ease;
+  }
+  .activation-input.success {
+    border-color: var(--success);
+    box-shadow: 0 0 0 4px rgba(46,125,50,0.1);
+  }
+  @keyframes inputShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-4px); }
+  }
+  .activation-error {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 8px;
+    display: none;
+    font-weight: 600;
+  }
+  .activation-dept {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-200);
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+  .activation-dept strong { color: var(--primary); }
+
+  .content { padding: 28px; }
+
+  /* Tab navigation */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: transparent;
+    color: var(--gray-500);
+  }
+  .tab-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .tab-btn:hover:not(.active) { color: var(--gray-700); }
+
+  .tab-content { display: none; animation: fadeIn 0.3s ease; }
+  .tab-content.active { display: block; }
+
+  .method-card {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+  .method-card:hover { border-color: var(--primary-light); }
+  .method-card h3 {
+    font-size: 17px;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .method-card p { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
+
+  .setup-steps {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+  }
+  .setup-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.6;
+  }
+  .setup-steps li:last-child { border-bottom: none; }
+  .setup-steps .step-icon {
+    background: var(--primary);
+    color: white;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .bookmarklet-drag-area {
+    background: linear-gradient(135deg, var(--primary-light), #f8bbd0);
+    border: 2px dashed var(--primary);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin: 16px 0;
+    transition: all 0.3s;
+  }
+  .bookmarklet-drag-area:hover {
+    background: linear-gradient(135deg, #f8bbd0, #f48fb1);
+    transform: scale(1.02);
+  }
+  .bookmarklet-link {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6f00, #ff8f00);
+    color: white !important;
+    padding: 12px 28px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(255,111,0,0.4);
+    cursor: grab;
+    transition: all 0.3s;
+    user-select: none;
+  }
+  .bookmarklet-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,111,0,0.5);
+  }
+  .bookmarklet-link:active { cursor: grabbing; }
+
+  .drag-hint {
+    font-size: 12px;
+    color: var(--primary);
+    margin-top: 10px;
+    font-weight: 500;
+  }
+  .drag-hint .arrow {
+    display: inline-block;
+    animation: pointUp 1s ease-in-out infinite;
+  }
+  @keyframes pointUp {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .step-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 2px solid var(--gray-200);
+    margin-bottom: 14px;
+    transition: all 0.3s;
+  }
+  .step-card.active { border-color: var(--primary); background: var(--primary-light); }
+  .step-card.done { border-color: var(--success); background: var(--success-light); }
+  .step-card.disabled { opacity: 0.5; }
+
+  .step-num {
+    background: var(--primary);
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-card.done .step-num { background: var(--success); }
+
+  .step-body { flex: 1; }
+  .step-body h3 { font-size: 15px; color: var(--primary-dark); margin-bottom: 4px; font-weight: 700; }
+  .step-body p { font-size: 13px; color: var(--gray-700); line-height: 1.6; }
+  .step-body .status { font-size: 13px; font-weight: 700; margin-top: 6px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: white;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(109,29,42,0.35);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, var(--success), #43a047);
+    color: white;
+  }
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46,125,50,0.35);
+  }
+  .btn-disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+  }
+  .btn-disabled:hover { transform: none; box-shadow: none; }
+
+  .file-area {
+    border: 2px dashed var(--primary);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(139,26,50,0.03);
+  }
+  .file-area:hover { background: var(--primary-light); border-color: var(--primary-dark); }
+  .file-area input { display: none; }
+  .file-area .icon { font-size: 36px; margin-bottom: 8px; }
+  .file-area p { color: var(--primary); font-size: 14px; font-weight: 500; }
+  .file-area .selected { color: var(--success); font-weight: 700; margin-top: 8px; font-size: 13px; }
+
+  .preview-box {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .preview-box table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .preview-box th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 12px;
+    text-align: right;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+  .preview-box td { padding: 8px 12px; border-bottom: 1px solid var(--gray-200); }
+  .preview-box tr:nth-child(even) td { background: rgba(139,26,50,0.04); }
+  .preview-box tr:hover td { background: rgba(139,26,50,0.08); }
+
+  .grade-badge {
+    background: var(--primary);
+    color: white;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+  }
+  .no-grade { color: var(--gray-500); font-style: italic; font-size: 12px; }
+
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .stat {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--gray-200);
+  }
+  .stat .num { font-size: 28px; font-weight: 800; color: var(--primary); }
+  .stat .label { font-size: 11px; color: var(--gray-500); font-weight: 500; }
+  .stat.success .num { color: var(--success); }
+  .stat.warning .num { color: var(--warning); }
+
+  .alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 14px;
+    display: none;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+  }
+  .alert-success { background: var(--success-light); border: 1px solid var(--success); color: var(--success); }
+  .alert-error { background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); }
+  .alert-info { background: var(--primary-light); border: 1px solid var(--primary); color: var(--primary-dark); }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    margin: 12px 0;
+    overflow: hidden;
+    display: none;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--success));
+    border-radius: 3px;
+    transition: width 0.6s ease;
+    width: 0%;
+  }
+
+  .footer {
+    background: var(--gray-50);
+    padding: 14px 28px;
+    text-align: center;
+    border-top: 1px solid var(--gray-200);
+    font-size: 12px;
+    color: var(--gray-500);
+    line-height: 1.8;
+  }
+  .footer strong { color: var(--primary); }
+
+  .action-result {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: var(--success);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    z-index: 10000;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    pointer-events: none;
+  }
+  .action-result.show { transform: translateX(-50%) translateY(0); }
+
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255,111,0,0.4); }
+    50% { box-shadow: 0 4px 25px rgba(255,111,0,0.7); }
+  }
+
+  @media (max-width: 500px) {
+    .container { border-radius: 14px; }
+    .header { padding: 24px 20px; }
+    .content { padding: 20px; }
+    .tabs { flex-direction: column; }
+    .stats-bar { flex-direction: column; }
+    .activation-card { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== ACTIVATION OVERLAY ==================== -->
+<div class="activation-overlay" id="activationOverlay">
+  <div class="activation-card">
+    <div class="lock-icon">🔐</div>
+    <h2>انتهت الفترة التجريبية</h2>
+    <p>لقد انتهت فترة الاستخدام التجريبي (10 أيام).<br>
+    أدخل رمز التفعيل للاستمرار في استخدام الأداة.</p>
+
+    <div class="activation-input-wrapper">
+      <input type="text" class="activation-input" id="activationInput"
+             placeholder="XXXX-XXXX-XXXX-XXXX-XXXX"
+             maxlength="24"
+             onkeyup="if(event.key==='Enter')validateActivation()">
+    </div>
+    <div class="activation-error" id="activationError">❌ رمز التفعيل غير صحيح. حاول مرة أخرى.</div>
+
+    <button class="btn btn-primary" onclick="validateActivation()" style="font-size:16px; padding:14px;">
+      🔓 تفعيل الأداة
+    </button>
+
+    <div class="activation-dept">
+      <strong>📐 قسم الرياضيات</strong><br>
+      تواصل مع رئيس قسم الرياضيات للحصول على رمز التفعيل
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="action-result"></div>
+
+<div class="container" id="mainContainer">
+  <!-- School Official Banner -->
+  <div class="school-banner">
+    <img src="school_header.png" alt="دولة قطر - وزارة التربية والتعليم - سعيد بن زيد الإعدادية للبنين">
+  </div>
+
+  <!-- Trial Banner -->
+  <div class="trial-banner" id="trialBanner">
+    ⏰ فترة تجريبية — متبقي <span class="days" id="trialDays">10</span> أيام
+    <div class="trial-progress"><div class="fill" id="trialFill" style="width:100%"></div></div>
+  </div>
+
+  <div class="header">
+    <div class="logo">🎓</div>
+    <h1>أداة رصد الدرجات التلقائي</h1>
+    <p>K12NET — رصد درجات الطلاب بضغطة واحدة</p>
+    <div class="dept-badge">📐 قسم الرياضيات</div>
+  </div>
+
+  <div class="content" id="mainContent">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-auto')">⚡ تلقائي (موصى به)</button>
+      <button class="tab-btn" onclick="switchTab('tab-manual')">🔧 يدوي</button>
+    </div>
+
+    <!-- ==================== TAB 1: Auto (Bookmarklet) ==================== -->
+    <div id="tab-auto" class="tab-content active">
+
+      <!-- Step A: Upload Excel -->
+      <div class="method-card" id="auto-step1">
+        <h3>📁 الخطوة 1: اختر ملف الدرجات</h3>
+        <p>اختر ملف Excel الذي يحتوي على أسماء الطلاب ودرجاتهم</p>
+        <div class="file-area" onclick="document.getElementById('autoFileInput').click()">
+          <input type="file" id="autoFileInput" accept=".xlsx,.xls,.csv" onchange="handleAutoFile(this)">
+          <div class="icon">📂</div>
+          <p>اضغط لاختيار ملف Excel</p>
+          <div class="selected" id="auto-file-name" style="display:none"></div>
+        </div>
+        <div class="preview-box" id="auto-preview"></div>
+      </div>
+
+      <!-- Step B: Drag bookmarklet -->
+      <div class="method-card" id="auto-step2" style="opacity:0.45; pointer-events:none;">
+        <h3>🔖 الخطوة 2: احفظ زر الرصد</h3>
+        <p>اسحب الزر البرتقالي التالي إلى <strong>شريط المفضلة</strong> في متصفحك (مرة واحدة فقط لكل صف)</p>
+
+        <div class="bookmarklet-drag-area">
+          <a id="bookmarklet-link" class="bookmarklet-link pulse" href="#" onclick="event.preventDefault(); showToast('⬆️ اسحب هذا الزر إلى شريط المفضلة - لا تضغط عليه!');">
+            🎓 رصد الدرجات
+          </a>
+          <div class="drag-hint">
+            <span class="arrow">⬆️</span> اسحبني إلى شريط المفضلة أعلاه
+          </div>
+        </div>
+
+        <div style="background: var(--warning-light); border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 12px; color: var(--warning);">
+          💡 <strong>لا تجد شريط المفضلة؟</strong> اضغط <kbd style="background:#eee; padding:2px 6px; border-radius:3px; font-size:11px;">Ctrl+Shift+B</kbd> لإظهاره
+        </div>
+      </div>
+
+      <!-- Step C: Use it -->
+      <div class="method-card" id="auto-step3" style="opacity:0.45; pointer-events:none;">
+        <h3>🚀 الخطوة 3: رصد الدرجات</h3>
+        <p>افتح صفحة K12NET واضغط على زر "رصد الدرجات" من شريط المفضلة</p>
+
+        <ul class="setup-steps">
+          <li>
+            <span class="step-icon">1</span>
+            <span>افتح صفحة <strong>سجل الدرجات</strong> في K12NET وحدد الصف والمادة ونوع التقييم</span>
+          </li>
+          <li>
+            <span class="step-icon">2</span>
+            <span>اضغط على زر <strong>"🎓 رصد الدرجات"</strong> من شريط المفضلة</span>
+          </li>
+          <li>
+            <span class="step-icon">3</span>
+            <span>سيتم رصد الدرجات وحفظها تلقائياً! ✅</span>
+          </li>
+        </ul>
+
+        <button class="btn btn-primary" onclick="openK12NET()" style="margin-top:12px;">
+          🌐 فتح صفحة K12NET
+        </button>
+      </div>
+
+      <!-- Alternative: Auto-copy method -->
+      <div class="method-card" id="auto-step-alt" style="opacity:0.45; pointer-events:none;">
+        <h3>📋 بديل: نسخ ولصق سريع</h3>
+        <p>إذا لم تستطع سحب الزر، يمكنك نسخ الكود ولصقه في Console</p>
+        <button class="btn btn-primary" id="copy-and-go-btn" onclick="copyAndGo()">
+          📋 نسخ الكود + فتح K12NET
+        </button>
+        <div class="alert" id="copy-alert"></div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: Manual (Console paste) ==================== -->
+    <div id="tab-manual" class="tab-content">
+      <div class="step-card active" id="manual-step1">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>اختر ملف الدرجات (Excel)</h3>
+          <p>اختر ملف Excel الذي يحتوي على درجات الطلاب</p>
+          <div class="file-area" onclick="document.getElementById('manualFileInput').click()">
+            <input type="file" id="manualFileInput" accept=".xlsx,.xls,.csv" onchange="handleManualFile(this)">
+            <div class="icon">📂</div>
+            <p>اضغط لاختيار ملف Excel</p>
+            <div class="selected" id="manual-file-name" style="display:none"></div>
+          </div>
+          <div class="preview-box" id="manual-preview"></div>
+        </div>
+      </div>
+
+      <div class="step-card disabled" id="manual-step2">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>نسخ كود الرصد</h3>
+          <p>سيتم نسخ الكود تلقائياً إلى الحافظة</p>
+          <button class="btn btn-disabled" id="manual-copy-btn" onclick="manualCopy()" disabled>
+            📋 نسخ الكود
+          </button>
+          <div class="status" id="manual-copy-status"></div>
+        </div>
+      </div>
+
+      <div class="step-card disabled" id="manual-step3">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>لصق الكود في K12NET</h3>
+          <p>افتح صفحة K12NET → اضغط F12 → Console → الصق (Ctrl+V) → Enter</p>
+          <button class="btn btn-disabled" id="manual-open-btn" onclick="openK12NET()" disabled>
+            🌐 فتح K12NET
+          </button>
+        </div>
+      </div>
+
+      <div class="alert" id="manual-alert"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>📐 أداة خاصة بقسم الرياضيات</strong><br>
+    أداة رصد الدرجات التلقائي | K12NET Grade Filler v2.0 | 2026<br>
+    جميع الحقوق محفوظة لقسم الرياضيات
+  </div>
+</div>
+
+<!-- SheetJS Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// ============================================================
+// PROTECTION SYSTEM — Anti-tamper & Anti-debugging
+// ============================================================
+(function() {
+  // Block right-click context menu
+  document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+  // Block keyboard shortcuts for DevTools & View Source
+  document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+    // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) { e.preventDefault(); return false; }
+    // Ctrl+U (view source)
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) { e.preventDefault(); return false; }
+  });
+
+  // Detect DevTools via debugger timing
+  var _dtCheck = setInterval(function() {
+    var t0 = performance.now();
+    (function(){}).constructor('debugger')();
+    var t1 = performance.now();
+    if (t1 - t0 > 100) {
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:white;font-family:Lusail+,Arial;font-size:24px;text-align:center;direction:rtl;padding:40px;">⛔ تم اكتشاف أدوات المطور<br>الرجاء إغلاق DevTools وتحديث الصفحة</div>';
+      clearInterval(_dtCheck);
+    }
+  }, 3000);
+
+  // Disable text selection on body (except inputs)
+  document.addEventListener('selectstart', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+  });
+})();
+
+// ============================================================
+// LICENSE SYSTEM — 10-day trial + activation code
+// ============================================================
+var _LICENSE = (function() {
+  // Obfuscated storage keys
+  var _K1 = '\x5f\x67\x74\x5f\x69\x6e'; // _gt_in
+  var _K2 = '\x5f\x67\x74\x5f\x62\x6b'; // _gt_bk
+  var _K3 = '\x5f\x67\x74\x5f\x61\x63'; // _gt_ac
+  var _TRIAL_DAYS = 10;
+
+  // Encode/decode helpers
+  function _enc(v) { return btoa('qm_' + v + '_dx'); }
+  function _dec(v) {
+    try {
+      var d = atob(v);
+      return d.replace(/^qm_/, '').replace(/_dx$/, '');
+    } catch(e) { return null; }
+  }
+
+  // Hashing function (djb2)
+  function _hash(str) {
+    var h = 5381;
+    for (var i = 0; i < str.length; i++) {
+      h = ((h << 5) + h) + str.charCodeAt(i);
+      h = h & 0x7FFFFFFF;
+    }
+    return h;
+  }
+
+  // Verify activation code
+  // The valid code hashes are pre-computed and split for obfuscation
+  function verifyCode(code) {
+    code = code.replace(/\s/g, '').toUpperCase();
+    var h = _hash(code);
+    // Pre-computed hash targets (multiple valid hashes for robustness)
+    var _t1 = 0x6E; // Part A
+    var _t2 = 0x2C9F; // Part B
+    var _t3 = 0x15A4B; // Part C
+    var target = (_t1 << 20) | (_t2 << 7) | _t3;
+    if (h === target) return true;
+    // Secondary check: encoded comparison in segments
+    var segs = ['\x4d\x41\x54\x48','\x51\x54\x52','\x4b\x31\x32\x4e','\x38\x58\x33\x5a','\x32\x30\x32\x36'];
+    var expected = segs.join('-');
+    return code === expected;
+  }
+
+  // Get stored timestamp
+  function _getTS() {
+    var v1 = localStorage.getItem(_K1);
+    var v2 = localStorage.getItem(_K2);
+    var ts = null;
+    if (v1) { var d = _dec(v1); if (d) ts = parseInt(d); }
+    if (!ts && v2) { var d = _dec(v2); if (d) ts = parseInt(d); }
+    return ts;
+  }
+
+  // Set timestamp
+  function _setTS(t) {
+    localStorage.setItem(_K1, _enc(String(t)));
+    localStorage.setItem(_K2, _enc(String(t)));
+  }
+
+  // Check if activated
+  function isActivated() {
+    var v = localStorage.getItem(_K3);
+    if (!v) return false;
+    var d = _dec(v);
+    return d && d.indexOf('activated') === 0;
+  }
+
+  // Activate
+  function activate(code) {
+    if (verifyCode(code)) {
+      localStorage.setItem(_K3, _enc('activated_' + Date.now()));
+      return true;
+    }
+    return false;
+  }
+
+  // Check trial status
+  function checkTrial() {
+    if (isActivated()) return { valid: true, activated: true, daysLeft: 999 };
+
+    var now = Date.now();
+    var firstUse = _getTS();
+
+    if (!firstUse) {
+      _setTS(now);
+      firstUse = now;
+    }
+
+    var elapsed = now - firstUse;
+    var totalMs = _TRIAL_DAYS * 24 * 60 * 60 * 1000;
+    var remaining = Math.max(0, totalMs - elapsed);
+    var daysLeft = Math.ceil(remaining / (24 * 60 * 60 * 1000));
+
+    return {
+      valid: daysLeft > 0,
+      activated: false,
+      daysLeft: daysLeft,
+      percent: Math.max(0, Math.min(100, (remaining / totalMs) * 100))
+    };
+  }
+
+  return {
+    checkTrial: checkTrial,
+    activate: activate,
+    isActivated: isActivated
+  };
+})();
+
+// ============================================================
+// Initialize License Check
+// ============================================================
+function initApp() {
+  var status = _LICENSE.checkTrial();
+
+  if (status.activated) {
+    // Fully activated — hide trial banner, show app
+    document.getElementById('trialBanner').style.display = 'none';
+    document.getElementById('activationOverlay').style.display = 'none';
+    return;
+  }
+
+  if (status.valid) {
+    // Trial active — show banner with countdown
+    var banner = document.getElementById('trialBanner');
+    banner.style.display = 'block';
+    document.getElementById('trialDays').textContent = status.daysLeft;
+    document.getElementById('trialFill').style.width = status.percent + '%';
+    document.getElementById('activationOverlay').style.display = 'none';
+  } else {
+    // Trial expired — show activation overlay
+    document.getElementById('trialBanner').style.display = 'none';
+    document.getElementById('activationOverlay').style.display = 'flex';
+    document.getElementById('mainContent').style.filter = 'blur(8px)';
+    document.getElementById('mainContent').style.pointerEvents = 'none';
+  }
+}
+
+function validateActivation() {
+  var input = document.getElementById('activationInput');
+  var errorEl = document.getElementById('activationError');
+  var code = input.value.trim();
+
+  if (!code) {
+    input.classList.add('error');
+    errorEl.style.display = 'block';
+    errorEl.textContent = '❌ الرجاء إدخال رمز التفعيل';
+    setTimeout(function() { input.classList.remove('error'); }, 1000);
+    return;
+  }
+
+  if (_LICENSE.activate(code)) {
+    // Success!
+    input.classList.remove('error');
+    input.classList.add('success');
+    errorEl.style.display = 'none';
+
+    setTimeout(function() {
+      document.getElementById('activationOverlay').style.display = 'none';
+      document.getElementById('mainContent').style.filter = '';
+      document.getElementById('mainContent').style.pointerEvents = '';
+      document.getElementById('trialBanner').style.display = 'none';
+      showToast('✅ تم تفعيل الأداة بنجاح!');
+    }, 800);
+  } else {
+    // Failed
+    input.classList.add('error');
+    errorEl.style.display = 'block';
+    errorEl.textContent = '❌ رمز التفعيل غير صحيح. حاول مرة أخرى.';
+    setTimeout(function() { input.classList.remove('error'); }, 1000);
+  }
+}
+
+// Run on load
+window.addEventListener('load', function() { initApp(); });
+
+// ============================================================
+// State
+// ============================================================
+var gradeData = {};
+var injectionScript = '';
+var fileLoaded = false;
+
+// ============================================================
+// Tab Switching
+// ============================================================
+function switchTab(tabId) {
+  var tabs = document.querySelectorAll('.tab-content');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  document.getElementById(tabId).classList.add('active');
+  var idx = tabId === 'tab-auto' ? 0 : 1;
+  btns[idx].classList.add('active');
+}
+
+// ============================================================
+// Toast Notification
+// ============================================================
+function showToast(msg) {
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// Alert Helper
+// ============================================================
+function showAlert(id, type, message) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'block';
+  el.className = 'alert alert-' + type;
+  el.innerHTML = message;
+}
+
+// ============================================================
+// Excel File Parsing (shared)
+// ============================================================
+function parseExcelFile(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = new Uint8Array(e.target.result);
+      var workbook = XLSX.read(data, { type: 'array' });
+      var sheetName = workbook.SheetNames[0];
+      var sheet = workbook.Sheets[sheetName];
+      var rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      var headerRowIndex = -1;
+      for (var i = 0; i < Math.min(10, rows.length); i++) {
+        var row = rows[i];
+        if (row && (row.indexOf('\u0627\u0644\u0637\u0644\u0627\u0628') !== -1 ||
+                    row.indexOf('\u0627\u0633\u0645 \u0627\u0644\u0637\u0627\u0644\u0628') !== -1 ||
+                    row.indexOf('\u0627\u0644\u0627\u0633\u0645') !== -1)) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+      if (headerRowIndex === -1) {
+        for (var i = 0; i < Math.min(10, rows.length); i++) {
+          var row = rows[i];
+          if (row && row.length >= 3) {
+            var nonEmpty = 0;
+            for (var j = 0; j < row.length; j++) {
+              if (row[j] !== null && row[j] !== undefined) nonEmpty++;
+            }
+            if (nonEmpty >= 3) { headerRowIndex = i; break; }
+          }
+        }
+      }
+
+      var dataStartRow = headerRowIndex + 1;
+      var gradeColIndex = 8;
+      var nameColIndex = 0;
+
+      gradeData = {};
+      var previewRows = [];
+
+      for (var i = dataStartRow; i < rows.length; i++) {
+        var row = rows[i];
+        if (!row || !row[nameColIndex]) continue;
+        var name = String(row[nameColIndex]).trim();
+        var grade = row[gradeColIndex];
+        if (name.length > 2) {
+          var gradeValue = (grade !== null && grade !== undefined && grade !== '-' && grade !== '')
+            ? String(grade).trim() : null;
+          gradeData[name] = gradeValue;
+          previewRows.push({ name: name, grade: gradeValue });
+        }
+      }
+
+      if (previewRows.length === 0) {
+        callback({ error: 'لم يتم العثور على بيانات طلاب في الملف' });
+        return;
+      }
+
+      buildInjectionScript();
+      callback({ success: true, rows: previewRows, fileName: file.name });
+    } catch (err) {
+      callback({ error: err.message });
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ============================================================
+// Build Injection Script
+// ============================================================
+function buildInjectionScript() {
+  var gradeDataStr = JSON.stringify(gradeData);
+
+  var s = [];
+  s.push('(function() {');
+  s.push('  var gradeMap = ' + gradeDataStr + ';');
+  s.push('  if (!window.location.href.includes("nsis.edu.gov.qa")) {');
+  s.push('    alert("This script must run on K12NET!\\nhttps://nsis.edu.gov.qa/GBJS.Web/#/score/1");');
+  s.push('    return;');
+  s.push('  }');
+  s.push('  if (typeof angular === "undefined") {');
+  s.push('    alert("Angular not found. Open the grade page first.");');
+  s.push('    return;');
+  s.push('  }');
+  s.push('  try {');
+  s.push('    var el = document.querySelector(\'[ng-repeat="enrollment in ViewModel.StudentSectionEnrollments"]\');');
+  s.push('    if (!el) { alert("Student table not found.\\nSelect: Semester + Assessment Type + Main Assessment"); return; }');
+  s.push('    var scope = angular.element(el).scope();');
+  s.push('    var vm = scope.ViewModel, dc = vm.DomainContext;');
+  s.push('    var nameDict = dc.NameDictionary, piList = dc.PersonalInfoList;');
+  s.push('    var piByID = {};');
+  s.push('    piList.forEach(function(pi) { piByID[pi.ID] = pi; });');
+  s.push('    var inputs = document.querySelectorAll(\'table input[type="text"].score-cell\');');
+  s.push('    var filled = 0, skipped = 0, notMatched = [];');
+  s.push('    Array.from(inputs).forEach(function(input) {');
+  s.push('      var pScope = angular.element(input.parentElement).scope();');
+  s.push('      var sid = pScope.studentID;');
+  s.push('      var pi = piByID[sid];');
+  s.push('      if (!pi || !pi.NameID || !nameDict[pi.NameID]) return;');
+  s.push('      var name = nameDict[pi.NameID].FullName;');
+  s.push('      var grade = gradeMap[name];');
+  s.push('      if (grade !== null && grade !== undefined) {');
+  s.push('        input.value = grade;');
+  s.push('        angular.element(input).triggerHandler("change");');
+  s.push('        angular.element(input).triggerHandler("blur");');
+  s.push('        filled++;');
+  s.push('      } else if (grade === null) { skipped++; }');
+  s.push('      else { notMatched.push(name); }');
+  s.push('    });');
+  s.push('    setTimeout(function() {');
+  s.push('      try {');
+  s.push('        if (vm.SubmitChanges) vm.SubmitChanges();');
+  s.push('        else dc.SubmitChanges();');
+  s.push('        var m = "\\u2705 Done!\\n\\nFilled: " + filled + "\\nSkipped: " + skipped;');
+  s.push('        if (notMatched.length > 0) m += "\\nNot matched: " + notMatched.join(", ");');
+  s.push('        alert(m);');
+  s.push('      } catch(e) { alert("Grades filled but save error: " + e.message + "\\nSave manually."); }');
+  s.push('    }, 1000);');
+  s.push('  } catch(e) { alert("Error: " + e.message); }');
+  s.push('})();');
+
+  injectionScript = s.join('\n');
+
+  var bmLink = document.getElementById('bookmarklet-link');
+  if (bmLink) {
+    bmLink.href = 'javascript:' + encodeURIComponent(injectionScript);
+  }
+}
+
+// ============================================================
+// Build Preview Table HTML
+// ============================================================
+function buildPreviewHTML(rows, fileName) {
+  var withGrades = 0, noGrades = 0;
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].grade !== null) withGrades++; else noGrades++;
+  }
+
+  var html = '<div class="stats-bar">' +
+    '<div class="stat"><div class="num">' + rows.length + '</div><div class="label">إجمالي الطلاب</div></div>' +
+    '<div class="stat success"><div class="num">' + withGrades + '</div><div class="label">لديهم درجات</div></div>' +
+    '<div class="stat warning"><div class="num">' + noGrades + '</div><div class="label">بدون درجة</div></div>' +
+    '</div>';
+
+  html += '<table><thead><tr><th>#</th><th>اسم الطالب</th><th>الدرجة</th></tr></thead><tbody>';
+  var showCount = Math.min(15, rows.length);
+  for (var i = 0; i < showCount; i++) {
+    var r = rows[i];
+    html += '<tr><td>' + (i+1) + '</td><td>' + r.name + '</td><td>';
+    if (r.grade !== null) {
+      html += '<span class="grade-badge">' + r.grade + '</span>';
+    } else {
+      html += '<span class="no-grade">—</span>';
+    }
+    html += '</td></tr>';
+  }
+  if (rows.length > 15) {
+    html += '<tr><td colspan="3" style="text-align:center; color:var(--gray-500); font-style:italic">... و ' + (rows.length - 15) + ' طالب آخر</td></tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+// ============================================================
+// TAB 1: Auto Method Handlers
+// ============================================================
+function handleAutoFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+
+  document.getElementById('auto-file-name').style.display = 'block';
+  document.getElementById('auto-file-name').textContent = '📄 ' + file.name;
+
+  parseExcelFile(file, function(result) {
+    if (result.error) {
+      showToast('❌ ' + result.error);
+      return;
+    }
+
+    fileLoaded = true;
+
+    var preview = document.getElementById('auto-preview');
+    preview.style.display = 'block';
+    preview.innerHTML = buildPreviewHTML(result.rows, result.fileName);
+
+    document.getElementById('auto-step2').style.opacity = '1';
+    document.getElementById('auto-step2').style.pointerEvents = 'auto';
+    document.getElementById('auto-step3').style.opacity = '1';
+    document.getElementById('auto-step3').style.pointerEvents = 'auto';
+    document.getElementById('auto-step-alt').style.opacity = '1';
+    document.getElementById('auto-step-alt').style.pointerEvents = 'auto';
+
+    var withGrades = 0;
+    for (var i = 0; i < result.rows.length; i++) {
+      if (result.rows[i].grade !== null) withGrades++;
+    }
+    showToast('✅ تم تحميل ' + withGrades + ' درجة بنجاح!');
+  });
+}
+
+// ============================================================
+// TAB 2: Manual Method Handlers
+// ============================================================
+function handleManualFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+
+  document.getElementById('manual-file-name').style.display = 'block';
+  document.getElementById('manual-file-name').textContent = '📄 ' + file.name;
+
+  parseExcelFile(file, function(result) {
+    if (result.error) {
+      showAlert('manual-alert', 'error', '❌ ' + result.error);
+      return;
+    }
+
+    fileLoaded = true;
+
+    var preview = document.getElementById('manual-preview');
+    preview.style.display = 'block';
+    preview.innerHTML = buildPreviewHTML(result.rows, result.fileName);
+
+    document.getElementById('manual-step1').classList.remove('active');
+    document.getElementById('manual-step1').classList.add('done');
+    document.getElementById('manual-step2').classList.remove('disabled');
+    document.getElementById('manual-step2').classList.add('active');
+
+    var copyBtn = document.getElementById('manual-copy-btn');
+    copyBtn.disabled = false;
+    copyBtn.className = 'btn btn-primary';
+  });
+}
+
+function manualCopy() {
+  if (!injectionScript) return;
+
+  copyToClipboard(injectionScript, function(ok) {
+    if (ok) {
+      document.getElementById('manual-step2').classList.remove('active');
+      document.getElementById('manual-step2').classList.add('done');
+      document.getElementById('manual-copy-status').innerHTML = '<span style="color:var(--success)">✅ تم النسخ!</span>';
+
+      document.getElementById('manual-step3').classList.remove('disabled');
+      document.getElementById('manual-step3').classList.add('active');
+      var openBtn = document.getElementById('manual-open-btn');
+      openBtn.disabled = false;
+      openBtn.className = 'btn btn-success';
+
+      showToast('✅ تم نسخ الكود!');
+    }
+  });
+}
+
+// ============================================================
+// Copy & Go
+// ============================================================
+function copyAndGo() {
+  if (!injectionScript) {
+    showAlert('copy-alert', 'error', '❌ يجب اختيار ملف الدرجات أولاً');
+    return;
+  }
+
+  copyToClipboard(injectionScript, function(ok) {
+    if (ok) {
+      showAlert('copy-alert', 'success',
+        '✅ <strong>تم نسخ الكود!</strong><br>' +
+        '1️⃣ اذهب لصفحة K12NET<br>' +
+        '2️⃣ اضغط <kbd style="background:#ddd;padding:2px 6px;border-radius:3px;">F12</kbd><br>' +
+        '3️⃣ اختر <strong>Console</strong><br>' +
+        '4️⃣ الصق <kbd style="background:#ddd;padding:2px 6px;border-radius:3px;">Ctrl+V</kbd> ثم <kbd style="background:#ddd;padding:2px 6px;border-radius:3px;">Enter</kbd>'
+      );
+      showToast('✅ تم نسخ الكود — افتح K12NET والصقه!');
+
+      setTimeout(function() {
+        window.open('https://nsis.edu.gov.qa/GBJS.Web/#/score/1', '_blank');
+      }, 800);
+    }
+  });
+}
+
+// ============================================================
+// Open K12NET
+// ============================================================
+function openK12NET() {
+  window.open('https://nsis.edu.gov.qa/GBJS.Web/#/score/1', '_blank');
+}
+
+// ============================================================
+// Clipboard Helper
+// ============================================================
+function copyToClipboard(text, cb) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      cb(true);
+    }).catch(function() {
+      fallbackCopy(text, cb);
+    });
+  } else {
+    fallbackCopy(text, cb);
+  }
+}
+
+function fallbackCopy(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    cb(true);
+  } catch(e) {
+    cb(false);
+  }
+  document.body.removeChild(ta);
+}
+
+// ============================================================
+// Integrity check — detect if core functions were modified
+// ============================================================
+(function() {
+  var _crit = [_LICENSE.checkTrial.toString().length, _LICENSE.activate.toString().length];
+  setInterval(function() {
+    try {
+      var c1 = _LICENSE.checkTrial.toString().length;
+      var c2 = _LICENSE.activate.toString().length;
+      if (c1 !== _crit[0] || c2 !== _crit[1]) {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:white;font-family:Lusail+,Arial;font-size:20px;text-align:center;direction:rtl;padding:40px;">⛔ تم اكتشاف تعديل غير مصرح به<br>الأداة معطلة</div>';
+      }
+    } catch(e) {}
+  }, 5000);
+})();
+</script>
+</body>
+</html>
