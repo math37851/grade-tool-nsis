@@ -3,856 +3,1125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أداة رصد الدرجات التلقائي</title>
+<title>أداة رصد الدرجات التلقائي | K12NET Grade Filler</title>
+
+<!-- Fonts from Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-  @font-face {
-    font-family: 'Lusail+';
-    src: url('Lusail-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Lusail+';
-    src: url('Lusail-Medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Lusail+';
-    src: url('Lusail-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-  }
-  @font-face {
-    font-family: 'Lusail+';
-    src: url('Lusail-Extrabold.ttf') format('truetype');
-    font-weight: 800;
-    font-style: normal;
-    font-display: swap;
-  }
-
   :root {
-    --primary: #8B1A32;
-    --primary-dark: #6D1D2A;
-    --primary-light: #fce4ec;
-    --success: #2e7d32;
-    --success-light: #e8f5e9;
-    --warning: #e65100;
-    --warning-light: #fff8e1;
-    --danger: #c62828;
-    --danger-light: #ffebee;
-    --gray-50: #fafafa;
-    --gray-100: #f5f5f5;
-    --gray-200: #eeeeee;
-    --gray-300: #e0e0e0;
-    --gray-500: #9e9e9e;
-    --gray-700: #616161;
-    --gray-900: #212121;
-    --radius: 14px;
-    --shadow: 0 20px 60px rgba(0,0,0,0.15);
-    --shadow-lg: 0 25px 80px rgba(0,0,0,0.25);
+    --bg-base: #0b0713;
+    --primary: #9d4edd;
+    --primary-glow: rgba(157, 78, 221, 0.4);
+    --primary-light: rgba(157, 78, 221, 0.1);
+    --secondary: #240046;
+    --accent: #3a0ca3;
+    --cyan: #4cc9f0;
+    --cyan-glow: rgba(76, 201, 240, 0.4);
+    --success: #06d6a0;
+    --success-glow: rgba(6, 214, 160, 0.4);
+    --warning: #ffb703;
+    --warning-glow: rgba(255, 183, 3, 0.4);
+    --danger: #ff006e;
+    --danger-glow: rgba(255, 0, 110, 0.4);
+    --text-main: #f8f9fa;
+    --text-muted: #a2a2c2;
+    --glass: rgba(20, 15, 35, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-highlight: rgba(255, 255, 255, 0.1);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
   body {
-    font-family: 'Lusail+', 'Segoe UI', Tahoma, Arial, sans-serif;
-    background: linear-gradient(135deg, #1a0a10 0%, #3d0f1e 30%, #6D1D2A 60%, #8B1A32 100%);
+    font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+    background: var(--bg-base);
+    color: var(--text-main);
     min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    flex-direction: column;
+    justify-content: space-between;
     overflow-x: hidden;
+    padding: 25px;
+    position: relative;
   }
 
-  body::before, body::after {
-    content: '';
+  /* Dynamic Glowing Blobs in Background */
+  .glow-blob {
     position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-    animation: float 8s ease-in-out infinite;
+    filter: blur(120px);
+    opacity: 0.18;
+    z-index: 0;
     pointer-events: none;
+    animation: floatGlow 15s ease-in-out infinite alternate;
   }
-  body::before {
-    width: 400px; height: 400px;
-    background: #e57373;
-    top: -100px; right: -100px;
+  .blob-1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--primary) 0%, rgba(0,0,0,0) 70%);
+    top: -150px;
+    right: -150px;
   }
-  body::after {
-    width: 300px; height: 300px;
-    background: #ce93d8;
-    bottom: -50px; left: -50px;
-    animation-delay: 4s;
+  .blob-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent) 0%, rgba(0,0,0,0) 70%);
+    bottom: -100px;
+    left: -100px;
+    animation-delay: -5s;
   }
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(30px, 20px) scale(1.1); }
-  }
-
-  .container {
-    background: rgba(255,255,255,0.97);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    box-shadow: var(--shadow-lg);
-    width: 100%;
-    max-width: 680px;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-    animation: slideUp 0.6s ease-out;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+  .blob-3 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--cyan) 0%, rgba(0,0,0,0) 70%);
+    top: 35%;
+    left: 25%;
+    animation-delay: -10s;
   }
 
-  .school-banner {
-    background: white;
-    padding: 14px 20px;
-    text-align: center;
-    border-bottom: 2px solid #8B1A32;
-  }
-  .school-banner img {
-    max-width: 100%;
-    height: auto;
-    max-height: 70px;
-    object-fit: contain;
+  @keyframes floatGlow {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.15; }
+    50% { transform: scale(1.15) translate(30px, -40px); opacity: 0.22; }
+    100% { transform: scale(0.9) translate(-20px, 20px); opacity: 0.18; }
   }
 
-  .header {
-    background: linear-gradient(135deg, #8B1A32 0%, #6D1D2A 50%, #8B1A32 100%);
-    color: white;
-    padding: 28px 30px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -50%; right: -20%;
-    width: 200px; height: 200px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 50%;
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    bottom: -60%; left: -15%;
-    width: 180px; height: 180px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 50%;
-  }
-  .header .logo {
-    font-size: 48px;
-    margin-bottom: 6px;
-    animation: bounce 2s ease-in-out infinite;
-  }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
-  .header p { font-size: 14px; opacity: 0.85; font-weight: 400; }
-  .header .dept-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 4px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    margin-top: 8px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-
-  /* Trial banner */
-  .trial-banner {
-    background: linear-gradient(90deg, #ff8f00, #f57c00);
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 700;
-    display: none;
-  }
-  .trial-banner .days {
-    display: inline-block;
-    background: rgba(0,0,0,0.2);
-    padding: 2px 10px;
-    border-radius: 10px;
-    margin: 0 4px;
-  }
-  .trial-progress {
-    height: 3px;
-    background: rgba(0,0,0,0.15);
-    border-radius: 2px;
-    margin-top: 6px;
-    overflow: hidden;
-  }
-  .trial-progress .fill {
-    height: 100%;
-    background: white;
-    border-radius: 2px;
-    transition: width 0.5s;
-  }
-
-  /* Activation overlay */
-  .activation-overlay {
+  /* Toast Notification */
+  .toast {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(10,5,8,0.95);
-    backdrop-filter: blur(15px);
-    z-index: 99999;
-    display: none;
+    bottom: 30px;
+    right: 30px;
+    background: rgba(15, 10, 25, 0.9);
+    border: 1px solid var(--primary);
+    border-left: 5px solid var(--primary);
+    color: var(--text-main);
+    padding: 16px 28px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow);
+    z-index: 10000;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  /* Main Container */
+  .dashboard {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    flex-grow: 1;
+  }
+
+  /* Glass Header Bar */
+  .header-bar {
+    background: var(--glass);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .header-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--cyan), transparent);
+  }
+  .header-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-icon {
+    font-size: 36px;
+    background: linear-gradient(135deg, var(--cyan), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px var(--primary-glow));
+    animation: iconPulse 3s ease-in-out infinite alternate;
+  }
+  @keyframes iconPulse {
+    0% { transform: scale(1) rotate(0); }
+    100% { transform: scale(1.08) rotate(5deg); }
+  }
+  .header-titles h1 {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 60%, #dedeff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header-titles p {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 3px;
+  }
+  .header-badges {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .badge-activated {
+    background: rgba(6, 214, 160, 0.1);
+    border: 1px solid var(--success);
+    color: var(--success);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 0 15px rgba(6, 214, 160, 0.2);
+  }
+  .badge-version {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* 3-Column Pipeline Grid */
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1.3fr 1.1fr;
+    gap: 25px;
+    flex-grow: 1;
+    align-items: stretch;
+  }
+
+  /* Pipeline Cards */
+  .pipeline-card {
+    background: var(--glass);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: var(--transition);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .pipeline-card:hover {
+    border-color: rgba(157, 78, 221, 0.25);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35), 0 0 20px rgba(157, 78, 221, 0.05);
+    transform: translateY(-3px);
+  }
+  .pipeline-card.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+    filter: blur(0.4px);
+  }
+  
+  /* Pipeline Card Header */
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+  }
+  .card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-icon {
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--cyan), var(--primary));
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    animation: fadeIn 0.5s ease;
+    box-shadow: 0 5px 15px rgba(157, 78, 221, 0.3);
   }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  .activation-card {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 480px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-    animation: slideUp 0.6s ease-out;
-  }
-  .activation-card .lock-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-    animation: shake 2s ease-in-out infinite;
-  }
-  @keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    10% { transform: rotate(-5deg); }
-    20% { transform: rotate(5deg); }
-    30% { transform: rotate(0deg); }
-  }
-  .activation-card h2 {
-    color: var(--primary-dark);
-    font-size: 22px;
+  .card-title {
+    font-size: 17px;
     font-weight: 800;
-    margin-bottom: 8px;
+    color: white;
   }
-  .activation-card p {
-    color: var(--gray-700);
-    font-size: 14px;
-    margin-bottom: 20px;
-    line-height: 1.7;
+  .card-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
   }
-  .activation-input-wrapper {
-    position: relative;
-    margin-bottom: 16px;
+  .step-badge {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: 'Outfit', sans-serif;
   }
-  .activation-input {
-    width: 100%;
-    padding: 14px 18px;
-    font-family: 'Consolas', 'Courier New', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    letter-spacing: 3px;
-    border: 2px solid var(--gray-300);
-    border-radius: 12px;
-    outline: none;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    direction: ltr;
-  }
-  .activation-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(139,26,50,0.1);
-  }
-  .activation-input.error {
-    border-color: var(--danger);
-    box-shadow: 0 0 0 4px rgba(198,40,40,0.1);
-    animation: inputShake 0.4s ease;
-  }
-  .activation-input.success {
-    border-color: var(--success);
-    box-shadow: 0 0 0 4px rgba(46,125,50,0.1);
-  }
-  @keyframes inputShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-8px); }
-    50% { transform: translateX(8px); }
-    75% { transform: translateX(-4px); }
-  }
-  .activation-error {
-    color: var(--danger);
-    font-size: 13px;
-    margin-top: 8px;
-    display: none;
-    font-weight: 600;
-  }
-  .activation-dept {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--gray-200);
-    font-size: 12px;
-    color: var(--gray-500);
-  }
-  .activation-dept strong { color: var(--primary); }
 
-  .content { padding: 28px; }
-
-  /* Tab navigation */
-  .tabs {
+  /* Segmented Controls (Tab Switcher) */
+  .segmented-control {
     display: flex;
-    gap: 4px;
-    background: var(--gray-100);
-    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
     padding: 4px;
-    margin-bottom: 24px;
+    width: 100%;
   }
-  .tab-btn {
+  .segment-btn {
     flex: 1;
-    padding: 12px 8px;
+    padding: 10px;
+    background: transparent;
     border: none;
     border-radius: 10px;
+    color: var(--text-muted);
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
-    background: transparent;
-    color: var(--gray-500);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
-  .tab-btn.active {
-    background: white;
-    color: var(--primary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  .segment-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
   }
-  .tab-btn:hover:not(.active) { color: var(--gray-700); }
+  .segment-btn:hover:not(.active) {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.03);
+  }
 
-  .tab-content { display: none; animation: fadeIn 0.3s ease; }
-  .tab-content.active { display: block; }
-
-  .method-card {
-    background: white;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius);
-    padding: 24px;
-    margin-bottom: 16px;
-    transition: all 0.3s;
+  /* Drag & Drop File Zone */
+  .drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-md);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.01);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    position: relative;
   }
-  .method-card:hover { border-color: var(--primary-light); }
-  .method-card h3 {
-    font-size: 17px;
-    color: var(--primary-dark);
-    margin-bottom: 6px;
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--cyan);
+    background: rgba(76, 201, 240, 0.04);
+    box-shadow: 0 0 30px rgba(76, 201, 240, 0.1) inset;
+  }
+  .drop-zone-icon {
+    font-size: 48px;
+    animation: iconFloat 4s ease-in-out infinite alternate;
+  }
+  @keyframes iconFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-8px); }
+  }
+  .drop-zone-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .drop-zone-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .drop-zone-file-info {
+    margin-top: 10px;
+    background: rgba(6, 214, 160, 0.08);
+    border: 1px dashed var(--success);
+    color: var(--success);
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  .method-card p { font-size: 13px; color: var(--gray-700); line-height: 1.7; }
 
-  .setup-steps {
-    list-style: none;
-    padding: 0;
-    margin-top: 16px;
-  }
-  .setup-steps li {
+  /* Empty States */
+  .empty-state {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--gray-200);
-    font-size: 14px;
-    color: var(--gray-700);
-    line-height: 1.6;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 15px;
+    margin: auto;
+    padding: 40px 20px;
+    opacity: 0.85;
+    animation: fadeIn 0.4s ease;
   }
-  .setup-steps li:last-child { border-bottom: none; }
-  .setup-steps .step-icon {
-    background: var(--primary);
-    color: white;
-    width: 28px; height: 28px;
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .empty-icon {
+    font-size: 56px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .empty-state h4 {
+    font-size: 15px;
     font-weight: 700;
-    flex-shrink: 0;
+    color: var(--text-main);
+  }
+  .empty-state p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 250px;
+  }
+
+  /* Stats Bar Panel */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 5px;
+  }
+  .stat-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-sm);
+    padding: 12px 10px;
+    text-align: center;
+    transition: var(--transition);
+  }
+  .stat-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+  }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    font-family: 'Outfit', sans-serif;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
     margin-top: 2px;
   }
+  .stat-card.success .stat-num { color: var(--success); }
+  .stat-card.warning .stat-num { color: var(--warning); }
 
-  .bookmarklet-drag-area {
-    background: linear-gradient(135deg, var(--primary-light), #f8bbd0);
-    border: 2px dashed var(--primary);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    margin: 16px 0;
-    transition: all 0.3s;
+  /* Live Search Box */
+  .search-box-container {
+    position: relative;
+    width: 100%;
   }
-  .bookmarklet-drag-area:hover {
-    background: linear-gradient(135deg, #f8bbd0, #f48fb1);
-    transform: scale(1.02);
+  .search-input {
+    width: 100%;
+    padding: 12px 40px 12px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+    transition: var(--transition);
   }
-  .bookmarklet-link {
-    display: inline-block;
-    background: linear-gradient(135deg, #ff6f00, #ff8f00);
-    color: white !important;
-    padding: 12px 28px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-size: 16px;
+  .search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.15);
+  }
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  /* Table Grid Preview */
+  .table-wrapper {
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    overflow-y: auto;
+    max-height: 280px;
+    background: rgba(0, 0, 0, 0.15);
+    flex-grow: 1;
+  }
+  .table-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+  .table-wrapper::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+  .table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: right;
+  }
+  .preview-table th {
+    background: rgba(20, 15, 30, 0.85);
+    color: var(--text-muted);
+    padding: 12px 16px;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(255,111,0,0.4);
-    cursor: grab;
-    transition: all 0.3s;
-    user-select: none;
+    position: sticky;
+    top: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 2;
   }
-  .bookmarklet-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255,111,0,0.5);
+  .preview-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    color: #e2e8f0;
   }
-  .bookmarklet-link:active { cursor: grabbing; }
+  .preview-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .grade-badge {
+    background: var(--primary-light);
+    border: 1px solid var(--primary);
+    color: #dfb2ff;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 11px;
+    font-family: 'Outfit', sans-serif;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(157, 78, 221, 0.1);
+  }
+  .no-grade-badge {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-style: italic;
+  }
 
-  .drag-hint {
+  /* Actions Layout & Buttons */
+  .action-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  /* Bookmarklet drag box */
+  .bookmarklet-box {
+    background: linear-gradient(135deg, rgba(157, 78, 221, 0.06), rgba(76, 201, 240, 0.06));
+    border: 1px dashed var(--primary);
+    border-radius: var(--radius-md);
+    padding: 24px 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .box-desc {
     font-size: 12px;
-    color: var(--primary);
-    margin-top: 10px;
+    color: var(--text-muted);
     font-weight: 500;
   }
-  .drag-hint .arrow {
+  .premium-bookmarklet {
     display: inline-block;
-    animation: pointUp 1s ease-in-out infinite;
+    background: linear-gradient(135deg, var(--cyan), var(--primary));
+    color: white !important;
+    padding: 14px 32px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 8px 25px rgba(157, 78, 221, 0.35);
+    cursor: grab;
+    transition: var(--transition);
+    user-select: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  @keyframes pointUp {
+  .premium-bookmarklet:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(157, 78, 221, 0.5), 0 0 15px var(--cyan);
+  }
+  .premium-bookmarklet:active {
+    cursor: grabbing;
+  }
+  .drag-arrow-hint {
+    font-size: 11px;
+    color: var(--cyan);
+    font-weight: 600;
+  }
+  .animated-arrow {
+    display: inline-block;
+    animation: bounceArrow 1s ease-in-out infinite;
+  }
+  @keyframes bounceArrow {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-4px); }
   }
 
-  .step-card {
+  /* Steps Lists */
+  .instructions-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .instructions-list li {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    padding: 20px;
-    border-radius: var(--radius);
-    border: 2px solid var(--gray-200);
-    margin-bottom: 14px;
-    transition: all 0.3s;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: #cbd5e0;
+    line-height: 1.6;
   }
-  .step-card.active { border-color: var(--primary); background: var(--primary-light); }
-  .step-card.done { border-color: var(--success); background: var(--success-light); }
-  .step-card.disabled { opacity: 0.5; }
-
-  .step-num {
+  .instructions-list .step-index {
     background: var(--primary);
     color: white;
-    width: 36px; height: 36px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 11px;
     font-weight: 700;
     flex-shrink: 0;
+    font-family: 'Outfit', sans-serif;
+    margin-top: 2px;
   }
-  .step-card.done .step-num { background: var(--success); }
 
-  .step-body { flex: 1; }
-  .step-body h3 { font-size: 15px; color: var(--primary-dark); margin-bottom: 4px; font-weight: 700; }
-  .step-body p { font-size: 13px; color: var(--gray-700); line-height: 1.6; }
-  .step-body .status { font-size: 13px; font-weight: 700; margin-top: 6px; }
-
+  /* Control buttons */
   .btn {
-    display: inline-flex;
+    width: 100%;
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-    margin-top: 10px;
+    gap: 10px;
+    text-decoration: none;
   }
-  .btn:active { transform: scale(0.97); }
+  .btn:active {
+    transform: scale(0.98);
+  }
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    background: linear-gradient(135deg, var(--cyan), var(--accent));
     color: white;
+    box-shadow: 0 4px 15px rgba(60, 12, 163, 0.4);
   }
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(109,29,42,0.35);
+    box-shadow: 0 8px 25px rgba(60, 12, 163, 0.6);
+    filter: brightness(1.1);
   }
-  .btn-success {
-    background: linear-gradient(135deg, var(--success), #43a047);
-    color: white;
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
   }
-  .btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(46,125,50,0.35);
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
   }
-  .btn-disabled {
-    background: var(--gray-300);
-    color: var(--gray-500);
-    cursor: not-allowed;
-  }
-  .btn-disabled:hover { transform: none; box-shadow: none; }
 
-  .file-area {
-    border: 2px dashed var(--primary);
-    border-radius: 12px;
-    padding: 24px;
-    text-align: center;
-    margin-top: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: rgba(139,26,50,0.03);
+  /* Info Note Bar */
+  .info-note {
+    background: rgba(255, 183, 3, 0.08);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 12px;
+    color: #ffe8ab;
+    line-height: 1.6;
   }
-  .file-area:hover { background: var(--primary-light); border-color: var(--primary-dark); }
-  .file-area input { display: none; }
-  .file-area .icon { font-size: 36px; margin-bottom: 8px; }
-  .file-area p { color: var(--primary); font-size: 14px; font-weight: 500; }
-  .file-area .selected { color: var(--success); font-weight: 700; margin-top: 8px; font-size: 13px; }
 
-  .preview-box {
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 16px;
-    display: none;
-    max-height: 300px;
+  /* Copy Console Alert Block */
+  .code-display-alert {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Consolas', monospace;
+    white-space: pre-line;
+    text-align: left;
+    direction: ltr;
+    max-height: 80px;
     overflow-y: auto;
   }
-  .preview-box table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .preview-box th {
-    background: var(--primary);
-    color: white;
-    padding: 10px 12px;
-    text-align: right;
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-  }
-  .preview-box td { padding: 8px 12px; border-bottom: 1px solid var(--gray-200); }
-  .preview-box tr:nth-child(even) td { background: rgba(139,26,50,0.04); }
-  .preview-box tr:hover td { background: rgba(139,26,50,0.08); }
 
-  .grade-badge {
-    background: var(--primary);
-    color: white;
-    padding: 3px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 12px;
-    display: inline-block;
-  }
-  .no-grade { color: var(--gray-500); font-style: italic; font-size: 12px; }
-
-  .stats-bar {
-    display: flex;
-    gap: 12px;
-    margin: 12px 0;
-  }
-  .stat {
-    flex: 1;
-    background: white;
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-    border: 1px solid var(--gray-200);
-  }
-  .stat .num { font-size: 28px; font-weight: 800; color: var(--primary); }
-  .stat .label { font-size: 11px; color: var(--gray-500); font-weight: 500; }
-  .stat.success .num { color: var(--success); }
-  .stat.warning .num { color: var(--warning); }
-
-  .alert {
-    padding: 12px 16px;
-    border-radius: 10px;
-    margin-top: 12px;
-    font-size: 14px;
-    display: none;
-    font-weight: 500;
-    animation: fadeIn 0.3s ease;
-  }
-  .alert-success { background: var(--success-light); border: 1px solid var(--success); color: var(--success); }
-  .alert-error { background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); }
-  .alert-info { background: var(--primary-light); border: 1px solid var(--primary); color: var(--primary-dark); }
-
-  .progress-bar {
-    height: 6px;
-    background: var(--gray-200);
-    border-radius: 3px;
-    margin: 12px 0;
-    overflow: hidden;
-    display: none;
-  }
-  .progress-bar .fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--success));
-    border-radius: 3px;
-    transition: width 0.6s ease;
-    width: 0%;
-  }
-
+  /* Footer Style */
   .footer {
-    background: var(--gray-50);
-    padding: 14px 28px;
     text-align: center;
-    border-top: 1px solid var(--gray-200);
-    font-size: 12px;
-    color: var(--gray-500);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    z-index: 1;
     line-height: 1.8;
   }
-  .footer strong { color: var(--primary); }
-
-  .action-result {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-100px);
-    background: var(--success);
-    color: white;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    z-index: 10000;
-    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    pointer-events: none;
-  }
-  .action-result.show { transform: translateX(-50%) translateY(0); }
-
-  .pulse { animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 4px 15px rgba(255,111,0,0.4); }
-    50% { box-shadow: 0 4px 25px rgba(255,111,0,0.7); }
+  .footer strong {
+    color: var(--primary);
   }
 
-  @media (max-width: 500px) {
-    .container { border-radius: 14px; }
-    .header { padding: 24px 20px; }
-    .content { padding: 20px; }
-    .tabs { flex-direction: column; }
-    .stats-bar { flex-direction: column; }
-    .activation-card { padding: 28px 20px; }
+  /* Responsive Adjustments */
+  @media (max-width: 1200px) {
+    .pipeline-grid {
+      grid-template-columns: 1fr;
+    }
+    .table-wrapper {
+      max-height: 320px;
+    }
   }
 </style>
 </head>
 <body>
 
-<div id="toast" class="action-result"></div>
+<!-- Backdrop Glow Blobs -->
+<div class="glow-blob blob-1"></div>
+<div class="glow-blob blob-2"></div>
+<div class="glow-blob blob-3"></div>
 
-<div class="container" id="mainContainer">
-
-  <div class="header">
-    <div class="logo">🎓</div>
-    <h1>أداة رصد الدرجات التلقائي</h1>
-    <p>K12NET — رصد درجات الطلاب بضغطة واحدة</p>
-  </div>
-
-  <div class="content" id="mainContent">
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('tab-auto')">⚡ تلقائي (موصى به)</button>
-      <button class="tab-btn" onclick="switchTab('tab-manual')">🔧 يدوي</button>
-    </div>
-
-    <!-- ==================== TAB 1: Auto (Bookmarklet) ==================== -->
-    <div id="tab-auto" class="tab-content active">
-
-      <!-- Step A: Upload Excel -->
-      <div class="method-card" id="auto-step1">
-        <h3>📁 الخطوة 1: اختر ملف الدرجات</h3>
-        <p>اختر ملف Excel يحتوي على عمودين (العمود A لأسماء الطلاب، والعمود B للدرجات)</p>
-        <div class="file-area" onclick="document.getElementById('autoFileInput').click()">
-          <input type="file" id="autoFileInput" accept=".xlsx,.xls,.csv" onchange="handleAutoFile(this)">
-          <div class="icon">📂</div>
-          <p>اضغط لاختيار ملف Excel</p>
-          <div class="selected" id="auto-file-name" style="display:none"></div>
-        </div>
-        <div class="preview-box" id="auto-preview"></div>
-      </div>
-
-      <!-- Step B: Drag bookmarklet -->
-      <div class="method-card" id="auto-step2" style="opacity:0.45; pointer-events:none;">
-        <h3>🔖 الخطوة 2: احفظ زر الرصد</h3>
-        <p>اسحب الزر البرتقالي التالي إلى <strong>شريط المفضلة</strong> في متصفحك (مرة واحدة فقط لكل صف)</p>
-
-        <div class="bookmarklet-drag-area">
-          <a id="bookmarklet-link" class="bookmarklet-link pulse" href="#" onclick="event.preventDefault(); showToast('⬆️ اسحب هذا الزر إلى شريط المفضلة - لا تضغط عليه!');">
-            🎓 رصد الدرجات
-          </a>
-          <div class="drag-hint">
-            <span class="arrow">⬆️</span> اسحبني إلى شريط المفضلة أعلاه
-          </div>
-        </div>
-
-        <div style="background: var(--warning-light); border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 12px; color: var(--warning);">
-          💡 <strong>لا تجد شريط المفضلة؟</strong> اضغط <kbd style="background:#eee; padding:2px 6px; border-radius:3px; font-size:11px;">Ctrl+Shift+B</kbd> لإظهاره
-        </div>
-      </div>
-
-      <!-- Step C: Use it -->
-      <div class="method-card" id="auto-step3" style="opacity:0.45; pointer-events:none;">
-        <h3>🚀 الخطوة 3: رصد الدرجات</h3>
-        <p>افتح صفحة K12NET واضغط على زر "رصد الدرجات" من شريط المفضلة</p>
-
-        <ul class="setup-steps">
-          <li>
-            <span class="step-icon">1</span>
-            <span>افتح صفحة <strong>سجل الدرجات</strong> في K12NET وحدد الصف والمادة ونوع التقييم</span>
-          </li>
-          <li>
-            <span class="step-icon">2</span>
-            <span>اضغط على زر <strong>"🎓 رصد الدرجات"</strong> من شريط المفضلة</span>
-          </li>
-          <li>
-            <span class="step-icon">3</span>
-            <span>سيتم رصد الدرجات وحفظها تلقائياً! ✅</span>
-          </li>
-        </ul>
-
-        <button class="btn btn-primary" onclick="openK12NET()" style="margin-top:12px;">
-          🌐 فتح صفحة K12NET
-        </button>
-      </div>
-
-      <!-- Alternative: Auto-copy method -->
-      <div class="method-card" id="auto-step-alt" style="opacity:0.45; pointer-events:none;">
-        <h3>📋 بديل: نسخ ولصق سريع</h3>
-        <p>إذا لم تستطع سحب الزر، يمكنك نسخ الكود ولصقه في Console</p>
-        <button class="btn btn-primary" id="copy-and-go-btn" onclick="copyAndGo()">
-          📋 نسخ الكود + فتح K12NET
-        </button>
-        <div class="alert" id="copy-alert"></div>
-      </div>
-    </div>
-
-    <!-- ==================== TAB 2: Manual (Console paste) ==================== -->
-    <div id="tab-manual" class="tab-content">
-      <div class="step-card active" id="manual-step1">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3>اختر ملف الدرجات (Excel)</h3>
-          <p>اختر ملف Excel يحتوي على عمودين (العمود A لأسماء الطلاب، والعمود B للدرجات)</p>
-          <div class="file-area" onclick="document.getElementById('manualFileInput').click()">
-            <input type="file" id="manualFileInput" accept=".xlsx,.xls,.csv" onchange="handleManualFile(this)">
-            <div class="icon">📂</div>
-            <p>اضغط لاختيار ملف Excel</p>
-            <div class="selected" id="manual-file-name" style="display:none"></div>
-          </div>
-          <div class="preview-box" id="manual-preview"></div>
-        </div>
-      </div>
-
-      <div class="step-card disabled" id="manual-step2">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3>نسخ كود الرصد</h3>
-          <p>سيتم نسخ الكود تلقائياً إلى الحافظة</p>
-          <button class="btn btn-disabled" id="manual-copy-btn" onclick="manualCopy()" disabled>
-            📋 نسخ الكود
-          </button>
-          <div class="status" id="manual-copy-status"></div>
-        </div>
-      </div>
-
-      <div class="step-card disabled" id="manual-step3">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h3>لصق الكود في K12NET</h3>
-          <p>افتح صفحة K12NET → اضغط F12 → Console → الصق (Ctrl+V) → Enter</p>
-          <button class="btn btn-disabled" id="manual-open-btn" onclick="openK12NET()" disabled>
-            🌐 فتح K12NET
-          </button>
-        </div>
-      </div>
-
-      <div class="alert" id="manual-alert"></div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <strong>⚡ أداة رصد الدرجات التلقائي</strong><br>
-    K12NET Grade Filler v2.0 | 2026<br>
-    جميع الحقوق محفوظة
-  </div>
+<!-- Toast Box -->
+<div id="toast" class="toast">
+  <span>💡</span>
+  <span id="toast-message">تم نسخ كود الرصد الذكي بنجاح!</span>
 </div>
 
-<!-- SheetJS Library -->
+<!-- Dashboard Container -->
+<div class="dashboard">
+
+  <!-- Elegant Top Header Bar -->
+  <header class="header-bar">
+    <div class="header-info">
+      <div class="header-icon">🎓</div>
+      <div class="header-titles">
+        <h1>أداة رصد الدرجات التلقائي</h1>
+        <p>بوابتك الذكية لرصد الدرجات بضغطة زر واحدة على منصة K12NET</p>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge-activated">🟢 نشطة ومفعلة للأبد</span>
+      <span class="badge-version">v2.0</span>
+    </div>
+  </header>
+
+  <!-- 3-Column Pipeline Section -->
+  <main class="pipeline-grid">
+
+    <!-- ==================== COLUMN 1 (Right): DATA SOURCE ==================== -->
+    <section class="pipeline-card" id="col-source">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon">📂</div>
+          <div>
+            <h3 class="card-title">استيراد البيانات</h3>
+            <p class="card-subtitle">الخطوة الأولى: رفع درجات الطلاب</p>
+          </div>
+        </div>
+        <span class="step-badge">1</span>
+      </div>
+
+      <!-- Unified Upload Area -->
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('excelFileInput').click()">
+        <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(this)">
+        <div class="drop-zone-icon">📥</div>
+        <div class="drop-zone-text" id="drop-zone-title">اسحب ملف الـ Excel هنا أو اضغط للتصفح</div>
+        <div class="drop-zone-hint">يقبل ملفاً مكوناً من عمودين (A للأسماء، B للدرجات)</div>
+        <div class="drop-zone-file-info" id="fileInfoBlock" style="display: none;">
+          <span id="loadedFileName">📄 grade_2026.xlsx</span>
+        </div>
+      </div>
+
+      <!-- Mode Selector -->
+      <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 700;">طريقة الرصد المطلوبة:</span>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="mode-auto" onclick="switchMode('auto')">
+            ⚡ تلقائي (Bookmarklet)
+          </button>
+          <button class="segment-btn" id="mode-manual" onclick="switchMode('manual')">
+            🔧 يدوي (Console Code)
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Helper Tips -->
+      <div class="info-note" style="margin-top: auto;">
+        💡 <strong>تلميح:</strong> لا تقلق بشأن صف العناوين في ملف الـ Excel! ستقوم الأداة بتخطيه بذكاء وقراءة الدرجات والأسماء تلقائياً.
+      </div>
+    </section>
+
+    <!-- ==================== COLUMN 2 (Center): LIVE PREVIEW ==================== -->
+    <section class="pipeline-card" id="col-preview">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: linear-gradient(135deg, var(--success), var(--cyan));">📊</div>
+          <div>
+            <h3 class="card-title">المعاينة والتحليل</h3>
+            <p class="card-subtitle">الخطوة الثانية: التحقق من التطابق</p>
+          </div>
+        </div>
+        <span class="step-badge">2</span>
+      </div>
+
+      <!-- Preview Empty State -->
+      <div class="empty-state" id="previewEmptyState">
+        <div class="empty-icon">📊</div>
+        <h4>بانتظار استيراد ملف الدرجات</h4>
+        <p>قم برفع ملف Excel في الخطوة الأولى لتظهر لك إحصائيات المعاينة وتصفية الأسماء هنا.</p>
+      </div>
+
+      <!-- Stats Indicators (Hidden Initially) -->
+      <div class="stats-bar" id="previewStatsBar" style="display: none;">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">الطلاب</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-num" id="stat-matched">0</div>
+          <div class="stat-label">بدرجة</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-num" id="stat-empty">0</div>
+          <div class="stat-label">بدون درجة</div>
+        </div>
+      </div>
+
+      <!-- Live Search Box (Hidden Initially) -->
+      <div class="search-box-container" id="searchContainer" style="display: none;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن اسم طالب للتحقق فوريًا..." oninput="filterPreviewTable()">
+      </div>
+
+      <!-- Scrollable Preview Table (Hidden Initially) -->
+      <div class="table-wrapper" id="previewTableWrapper" style="display: none;">
+        <table class="preview-table" id="previewTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم الطالب</th>
+              <th style="width: 80px;">الدرجة</th>
+            </tr>
+          </thead>
+          <tbody id="previewTableBody">
+            <!-- Dynamically populated rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== COLUMN 3 (Left): OPERATE & RUN ==================== -->
+    <section class="pipeline-card" id="col-run">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: linear-gradient(135deg, var(--danger), var(--primary));">🚀</div>
+          <div>
+            <h3 class="card-title">لوحة الرصد والتشغيل</h3>
+            <p class="card-subtitle">الخطوة الثالثة: نقل الدرجات إلى الصف</p>
+          </div>
+        </div>
+        <span class="step-badge">3</span>
+      </div>
+
+      <!-- Run Empty State -->
+      <div class="empty-state" id="runEmptyState">
+        <div class="empty-icon">🚀</div>
+        <h4>بانتظار تجهيز كود الرصد</h4>
+        <p>بمجرد رفع الملف في الخطوة الأولى، سيتم إنشاء زر الرصد السحري والكود التفاعلي تلقائياً.</p>
+      </div>
+
+      <!-- Active Operations Container (Hidden Initially) -->
+      <div class="action-block" id="activeOperations" style="display: none;">
+        
+        <!-- AUTO METHOD SUB-PANEL -->
+        <div id="sub-panel-auto" style="display: flex; flex-direction: column; gap: 15px;">
+          <div class="bookmarklet-box">
+            <p class="box-desc">قم بسحب وإلقاء الزر التالي في شريط المفضلة لديك:</p>
+            <a id="bookmarklet-link" class="premium-bookmarklet" href="#" onclick="event.preventDefault(); showToast('⬆️ اسحب هذا الزر وأسقطه في شريط المفضلة أعلاه - لا تقم بالضغط عليه!');">
+              🚀 رصد درجات K12NET
+            </a>
+            <div class="drag-arrow-hint">
+              <span class="animated-arrow">⬆️</span> اسحبني لشريط الإشارات (Bookmarks Bar)
+            </div>
+          </div>
+
+          <ul class="instructions-list">
+            <li>
+              <span class="step-index">1</span>
+              <span>افتح صفحة <strong>رصد الدرجات</strong> في K12NET وحدد الصف والتقييم.</span>
+            </li>
+            <li>
+              <span class="step-index">2</span>
+              <span>اضغط على الزر <strong>"🚀 رصد درجات K12NET"</strong> من شريط المفضلة.</span>
+            </li>
+            <li>
+              <span class="step-index">3</span>
+              <span>ستقوم الأداة برصد الدرجات تلقائياً وحفظها! ✅</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- MANUAL METHOD SUB-PANEL -->
+        <div id="sub-panel-manual" style="display: none; flex-direction: column; gap: 15px;">
+          <button class="btn btn-primary" onclick="copyAndGo()">
+            📋 نسخ كود الرصد + فتح K12NET
+          </button>
+
+          <div class="code-display-alert" id="codeAlertBox">
+            // سيظهر مقتطف من الكود المولد هنا بعد رفع الملف...
+          </div>
+
+          <ul class="instructions-list">
+            <li>
+              <span class="step-index">1</span>
+              <span>توجه إلى K12NET وافتح صفحة رصد الدرجات للصف المحدد.</span>
+            </li>
+            <li>
+              <span class="step-index">2</span>
+              <span>اضغط على مفتاح <kbd style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 3px;">F12</kbd> لفتح أدوات المطورين، ثم اختر تبويب <strong>Console</strong>.</span>
+            </li>
+            <li>
+              <span class="step-index">3</span>
+              <span>الصق الكود المنسوخ (<kbd style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 3px;">Ctrl + V</kbd>) ثم اضغط <kbd style="background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 3px;">Enter</kbd>.</span>
+            </li>
+          </ul>
+        </div>
+
+        <button class="btn btn-secondary" onclick="openK12NET()" style="margin-top: 5px;">
+          🌐 الانتقال لصفحة K12NET
+        </button>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Premium Bottom Footer -->
+  <footer class="footer">
+    <strong>⚡ أداة رصد الدرجات التلقائي | K12NET Grade Filler</strong><br>
+    بنيت خصيصاً لتوفير الوقت والجهد على المعلمين | جميع الحقوق محفوظة لعام 2026
+  </footer>
+
+</div>
+
+<!-- SheetJS Library for parsing Excel -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 // ============================================================
-// APP INITIALIZATION
-// ============================================================
-function initApp() {
-  // الأداة مفعلة بالكامل ومفتوحة المصدر بشكل دائم
-}
-
-// Run on load
-window.addEventListener('load', function() { initApp(); });
-
-// ============================================================
-// State
+// State Management
 // ============================================================
 var gradeData = {};
+var previewRowsList = [];
 var injectionScript = '';
-var fileLoaded = false;
+var selectedMode = 'auto'; // 'auto' | 'manual'
+var isFileLoaded = false;
 
-// ============================================================
-// Tab Switching
-// ============================================================
-function switchTab(tabId) {
-  var tabs = document.querySelectorAll('.tab-content');
-  var btns = document.querySelectorAll('.tab-btn');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
-  document.getElementById(tabId).classList.add('active');
-  var idx = tabId === 'tab-auto' ? 0 : 1;
-  btns[idx].classList.add('active');
+// Initialize app elements & drag-drop logic
+window.addEventListener('load', function() {
+  setupDragAndDrop();
+});
+
+// Setup dynamic drag and drop handlers
+function setupDragAndDrop() {
+  var dropZone = document.getElementById('dropZone');
+  
+  if (!dropZone) return;
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, function(e) {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, function(e) {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+    }, false);
+  });
+
+  dropZone.addEventListener('drop', function(e) {
+    var dt = e.dataTransfer;
+    var files = dt.files;
+    if (files.length > 0) {
+      document.getElementById('excelFileInput').files = files;
+      handleFileSelect(document.getElementById('excelFileInput'));
+    }
+  }, false);
 }
 
-// ============================================================
-// Toast Notification
-// ============================================================
+// Switch view mode between Auto (Bookmarklet) and Manual (Console Code)
+function switchMode(mode) {
+  selectedMode = mode;
+  
+  var autoBtn = document.getElementById('mode-auto');
+  var manualBtn = document.getElementById('mode-manual');
+  var autoPanel = document.getElementById('sub-panel-auto');
+  var manualPanel = document.getElementById('sub-panel-manual');
+
+  if (mode === 'auto') {
+    autoBtn.classList.add('active');
+    manualBtn.classList.remove('active');
+    autoPanel.style.display = 'flex';
+    manualPanel.style.display = 'none';
+  } else {
+    autoBtn.classList.remove('active');
+    manualBtn.classList.add('active');
+    autoPanel.style.display = 'none';
+    manualPanel.style.display = 'flex';
+  }
+}
+
+// Toast notification helper
 function showToast(msg) {
   var toast = document.getElementById('toast');
-  toast.textContent = msg;
+  var toastMsg = document.getElementById('toast-message');
+  if (!toast || !toastMsg) return;
+
+  toastMsg.textContent = msg;
   toast.classList.add('show');
-  setTimeout(function() { toast.classList.remove('show'); }, 3000);
+  
+  setTimeout(function() {
+    toast.classList.remove('show');
+  }, 3500);
 }
 
-// ============================================================
-// Alert Helper
-// ============================================================
-function showAlert(id, type, message) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  el.style.display = 'block';
-  el.className = 'alert alert-' + type;
-  el.innerHTML = message;
+// Handle File upload / selection
+function handleFileSelect(input) {
+  var file = input.files[0];
+  if (!file) return;
+
+  // Show visual filename inside upload zone
+  var infoBlock = document.getElementById('fileInfoBlock');
+  var loadedNameText = document.getElementById('loadedFileName');
+  var zoneTitleText = document.getElementById('drop-zone-title');
+
+  zoneTitleText.style.display = 'none';
+  infoBlock.style.display = 'flex';
+  loadedNameText.textContent = '📄 ' + file.name;
+
+  parseExcelFile(file, function(result) {
+    if (result.error) {
+      showToast('❌ خطأ في معالجة الملف: ' + result.error);
+      resetFileArea();
+      return;
+    }
+
+    isFileLoaded = true;
+    previewRowsList = result.rows;
+
+    // Activate middle column (Preview & stats)
+    document.getElementById('previewEmptyState').style.display = 'none';
+    document.getElementById('previewStatsBar').style.display = 'grid';
+    document.getElementById('searchContainer').style.display = 'block';
+    document.getElementById('previewTableWrapper').style.display = 'block';
+
+    // Populate Stats and preview table
+    renderPreviewTable(result.rows);
+    updateStats(result.rows);
+
+    // Activate third column (Execution / Operations)
+    document.getElementById('runEmptyState').style.display = 'none';
+    document.getElementById('activeOperations').style.display = 'flex';
+
+    var matchedCount = 0;
+    for (var i = 0; i < result.rows.length; i++) {
+      if (result.rows[i].grade !== null) matchedCount++;
+    }
+    
+    showToast('✅ تم استيراد ' + matchedCount + ' درجة طالب بنجاح!');
+  });
 }
 
-// ============================================================
-// Excel File Parsing (shared)
-// ============================================================
+// Reset upload zone to default state
+function resetFileArea() {
+  var infoBlock = document.getElementById('fileInfoBlock');
+  var zoneTitleText = document.getElementById('drop-zone-title');
+  var input = document.getElementById('excelFileInput');
+
+  if (input) input.value = '';
+  zoneTitleText.style.display = 'block';
+  infoBlock.style.display = 'none';
+}
+
+// Smart excel parsing utility (identical logic with gorgeous grid updates)
 function parseExcelFile(file, callback) {
   var reader = new FileReader();
   reader.onload = function(e) {
@@ -863,6 +1132,7 @@ function parseExcelFile(file, callback) {
       var sheet = workbook.Sheets[sheetName];
       var rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+      // Scan top 5 rows for standard title/header indicators
       var headerRowIndex = -1;
       for (var i = 0; i < Math.min(5, rows.length); i++) {
         var row = rows[i];
@@ -882,7 +1152,7 @@ function parseExcelFile(file, callback) {
       var gradeColIndex = 1;
 
       gradeData = {};
-      var previewRows = [];
+      var parsedRows = [];
 
       for (var i = dataStartRow; i < rows.length; i++) {
         var row = rows[i];
@@ -893,17 +1163,17 @@ function parseExcelFile(file, callback) {
           var gradeValue = (grade !== null && grade !== undefined && grade !== '-' && grade !== '')
             ? String(grade).trim() : null;
           gradeData[name] = gradeValue;
-          previewRows.push({ name: name, grade: gradeValue });
+          parsedRows.push({ name: name, grade: gradeValue });
         }
       }
 
-      if (previewRows.length === 0) {
-        callback({ error: 'لم يتم العثور على بيانات طلاب في الملف' });
+      if (parsedRows.length === 0) {
+        callback({ error: 'لم يتم العثور على بيانات طلاب مطابقة في العمودين A و B' });
         return;
       }
 
       buildInjectionScript();
-      callback({ success: true, rows: previewRows, fileName: file.name });
+      callback({ success: true, rows: parsedRows, fileName: file.name });
     } catch (err) {
       callback({ error: err.message });
     }
@@ -911,9 +1181,7 @@ function parseExcelFile(file, callback) {
   reader.readAsArrayBuffer(file);
 }
 
-// ============================================================
-// Build Injection Script
-// ============================================================
+// Generate the fully unlocked pre-activated bookmarklet & console script
 function buildInjectionScript() {
   var gradeDataStr = JSON.stringify(gradeData);
 
@@ -921,16 +1189,16 @@ function buildInjectionScript() {
   s.push('(function() {');
   s.push('  var gradeMap = ' + gradeDataStr + ';');
   s.push('  if (!window.location.href.includes("nsis.edu.gov.qa")) {');
-  s.push('    alert("This script must run on K12NET!\\nhttps://nsis.edu.gov.qa/GBJS.Web/#/score/1");');
+  s.push('    alert("⚠️ هذا الكود يجب تشغيله على صفحة رصد K12NET!\\nhttps://nsis.edu.gov.qa/GBJS.Web/#/score/1");');
   s.push('    return;');
   s.push('  }');
   s.push('  if (typeof angular === "undefined") {');
-  s.push('    alert("Angular not found. Open the grade page first.");');
+  s.push('    alert("⚠️ لم يتم العثور على محرك الصفحة. يرجى الانتظار حتى تحميل صفحة رصد الدرجات بالكامل.");');
   s.push('    return;');
   s.push('  }');
   s.push('  try {');
   s.push('    var el = document.querySelector(\'[ng-repeat="enrollment in ViewModel.StudentSectionEnrollments"]\');');
-  s.push('    if (!el) { alert("Student table not found.\\nSelect: Semester + Assessment Type + Main Assessment"); return; }');
+  s.push('    if (!el) { alert("⚠️ لم يتم العثور على جدول الطلاب. تأكد من تحديد الصف + التقييم الرئيسي في النظام."); return; }');
   s.push('    var scope = angular.element(el).scope();');
   s.push('    var vm = scope.ViewModel, dc = vm.DomainContext;');
   s.push('    var nameDict = dc.NameDictionary, piList = dc.PersonalInfoList;');
@@ -957,183 +1225,119 @@ function buildInjectionScript() {
   s.push('      try {');
   s.push('        if (vm.SubmitChanges) vm.SubmitChanges();');
   s.push('        else dc.SubmitChanges();');
-  s.push('        var m = "\\u2705 Done!\\n\\nFilled: " + filled + "\\nSkipped: " + skipped;');
-  s.push('        if (notMatched.length > 0) m += "\\nNot matched: " + notMatched.join(", ");');
+  s.push('        var m = "✅ تم الانتهاء من رصد الدرجات بنجاح!\\n\\nعدد الطلاب الذين تم رصدهم: " + filled + "\\nعدد الطلاب الذين تم تخطيهم: " + skipped;');
+  s.push('        if (notMatched.length > 0) m += "\\n\\nالطلاب غير الموجودين بالملف: " + notMatched.join(", ");');
   s.push('        alert(m);');
-  s.push('      } catch(e) { alert("Grades filled but save error: " + e.message + "\\nSave manually."); }');
+  s.push('      } catch(e) { alert("تم ملء الدرجات ولكن حدث خطأ أثناء الحفظ التلقائي: " + e.message + "\\nيرجى الضغط على زر حفظ يدوياً."); }');
   s.push('    }, 1000);');
-  s.push('  } catch(e) { alert("Error: " + e.message); }');
+  s.push('  } catch(e) { alert("حدث خطأ غير متوقع: " + e.message); }');
   s.push('})();');
 
   injectionScript = s.join('\n');
 
+  // Update Bookmarklet element
   var bmLink = document.getElementById('bookmarklet-link');
   if (bmLink) {
     bmLink.href = 'javascript:' + encodeURIComponent(injectionScript);
   }
+
+  // Update the short preview code display panel
+  var codeAlertBox = document.getElementById('codeAlertBox');
+  if (codeAlertBox) {
+    codeAlertBox.textContent = injectionScript.substring(0, 150) + '\n// ... بقية الكود المولد تلقائياً ...';
+  }
 }
 
-// ============================================================
-// Build Preview Table HTML
-// ============================================================
-function buildPreviewHTML(rows, fileName) {
-  var withGrades = 0, noGrades = 0;
+// Update stats display numbers
+function updateStats(rows) {
+  var withGrades = 0;
+  var noGrades = 0;
+
   for (var i = 0; i < rows.length; i++) {
     if (rows[i].grade !== null) withGrades++; else noGrades++;
   }
 
-  var html = '<div class="stats-bar">' +
-    '<div class="stat"><div class="num">' + rows.length + '</div><div class="label">إجمالي الطلاب</div></div>' +
-    '<div class="stat success"><div class="num">' + withGrades + '</div><div class="label">لديهم درجات</div></div>' +
-    '<div class="stat warning"><div class="num">' + noGrades + '</div><div class="label">بدون درجة</div></div>' +
-    '</div>';
+  document.getElementById('stat-total').textContent = rows.length;
+  document.getElementById('stat-matched').textContent = withGrades;
+  document.getElementById('stat-empty').textContent = noGrades;
+}
 
-  html += '<table><thead><tr><th>#</th><th>اسم الطالب</th><th>الدرجة</th></tr></thead><tbody>';
-  var showCount = Math.min(15, rows.length);
-  for (var i = 0; i < showCount; i++) {
+// Populate HTML table body rows
+function renderPreviewTable(rows) {
+  var tbody = document.getElementById('previewTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  for (var i = 0; i < rows.length; i++) {
     var r = rows[i];
-    html += '<tr><td>' + (i+1) + '</td><td>' + r.name + '</td><td>';
+    var tr = document.createElement('tr');
+    
+    var tdNum = document.createElement('td');
+    tdNum.textContent = i + 1;
+    tdNum.style.fontFamily = "'Outfit', sans-serif";
+    tdNum.style.color = "var(--text-muted)";
+    tr.appendChild(tdNum);
+
+    var tdName = document.createElement('td');
+    tdName.textContent = r.name;
+    tdName.style.fontWeight = '600';
+    tr.appendChild(tdName);
+
+    var tdGrade = document.createElement('td');
     if (r.grade !== null) {
-      html += '<span class="grade-badge">' + r.grade + '</span>';
+      tdGrade.innerHTML = '<span class="grade-badge">' + r.grade + '</span>';
     } else {
-      html += '<span class="no-grade">—</span>';
+      tdGrade.innerHTML = '<span class="no-grade-badge">—</span>';
     }
-    html += '</td></tr>';
+    tr.appendChild(tdGrade);
+
+    tbody.appendChild(tr);
   }
-  if (rows.length > 15) {
-    html += '<tr><td colspan="3" style="text-align:center; color:var(--gray-500); font-style:italic">... و ' + (rows.length - 15) + ' طالب آخر</td></tr>';
+}
+
+// Filter the active preview list inside Column 2 in real-time
+function filterPreviewTable() {
+  var query = document.getElementById('searchInput').value.trim().toLowerCase();
+  var tbody = document.getElementById('previewTableBody');
+  if (!tbody) return;
+
+  var trs = tbody.getElementsByTagName('tr');
+  for (var i = 0; i < trs.length; i++) {
+    var tr = trs[i];
+    var nameText = tr.getElementsByTagName('td')[1]?.textContent || '';
+    if (nameText.toLowerCase().includes(query)) {
+      tr.style.display = '';
+    } else {
+      tr.style.display = 'none';
+    }
   }
-  html += '</tbody></table>';
-  return html;
 }
 
-// ============================================================
-// TAB 1: Auto Method Handlers
-// ============================================================
-function handleAutoFile(input) {
-  var file = input.files[0];
-  if (!file) return;
-
-  document.getElementById('auto-file-name').style.display = 'block';
-  document.getElementById('auto-file-name').textContent = '📄 ' + file.name;
-
-  parseExcelFile(file, function(result) {
-    if (result.error) {
-      showToast('❌ ' + result.error);
-      return;
-    }
-
-    fileLoaded = true;
-
-    var preview = document.getElementById('auto-preview');
-    preview.style.display = 'block';
-    preview.innerHTML = buildPreviewHTML(result.rows, result.fileName);
-
-    document.getElementById('auto-step2').style.opacity = '1';
-    document.getElementById('auto-step2').style.pointerEvents = 'auto';
-    document.getElementById('auto-step3').style.opacity = '1';
-    document.getElementById('auto-step3').style.pointerEvents = 'auto';
-    document.getElementById('auto-step-alt').style.opacity = '1';
-    document.getElementById('auto-step-alt').style.pointerEvents = 'auto';
-
-    var withGrades = 0;
-    for (var i = 0; i < result.rows.length; i++) {
-      if (result.rows[i].grade !== null) withGrades++;
-    }
-    showToast('✅ تم تحميل ' + withGrades + ' درجة بنجاح!');
-  });
-}
-
-// ============================================================
-// TAB 2: Manual Method Handlers
-// ============================================================
-function handleManualFile(input) {
-  var file = input.files[0];
-  if (!file) return;
-
-  document.getElementById('manual-file-name').style.display = 'block';
-  document.getElementById('manual-file-name').textContent = '📄 ' + file.name;
-
-  parseExcelFile(file, function(result) {
-    if (result.error) {
-      showAlert('manual-alert', 'error', '❌ ' + result.error);
-      return;
-    }
-
-    fileLoaded = true;
-
-    var preview = document.getElementById('manual-preview');
-    preview.style.display = 'block';
-    preview.innerHTML = buildPreviewHTML(result.rows, result.fileName);
-
-    document.getElementById('manual-step1').classList.remove('active');
-    document.getElementById('manual-step1').classList.add('done');
-    document.getElementById('manual-step2').classList.remove('disabled');
-    document.getElementById('manual-step2').classList.add('active');
-
-    var copyBtn = document.getElementById('manual-copy-btn');
-    copyBtn.disabled = false;
-    copyBtn.className = 'btn btn-primary';
-  });
-}
-
-function manualCopy() {
-  if (!injectionScript) return;
-
-  copyToClipboard(injectionScript, function(ok) {
-    if (ok) {
-      document.getElementById('manual-step2').classList.remove('active');
-      document.getElementById('manual-step2').classList.add('done');
-      document.getElementById('manual-copy-status').innerHTML = '<span style="color:var(--success)">✅ تم النسخ!</span>';
-
-      document.getElementById('manual-step3').classList.remove('disabled');
-      document.getElementById('manual-step3').classList.add('active');
-      var openBtn = document.getElementById('manual-open-btn');
-      openBtn.disabled = false;
-      openBtn.className = 'btn btn-success';
-
-      showToast('✅ تم نسخ الكود!');
-    }
-  });
-}
-
-// ============================================================
-// Copy & Go
-// ============================================================
+// Copy to Clipboard and execute open
 function copyAndGo() {
-  if (!injectionScript) {
-    showAlert('copy-alert', 'error', '❌ يجب اختيار ملف الدرجات أولاً');
+  if (!isFileLoaded || !injectionScript) {
+    showToast('⚠️ يرجى رفع ملف الدرجات Excel أولاً لتوليد كود الرصد!');
     return;
   }
 
   copyToClipboard(injectionScript, function(ok) {
     if (ok) {
-      showAlert('copy-alert', 'success',
-        '✅ <strong>تم نسخ الكود!</strong><br>' +
-        '1️⃣ اذهب لصفحة K12NET<br>' +
-        '2️⃣ اضغط <kbd style="background:#ddd;padding:2px 6px;border-radius:3px;">F12</kbd><br>' +
-        '3️⃣ اختر <strong>Console</strong><br>' +
-        '4️⃣ الصق <kbd style="background:#ddd;padding:2px 6px;border-radius:3px;">Ctrl+V</kbd> ثم <kbd style="background:#ddd;padding:2px 6px;border-radius:3px;">Enter</kbd>'
-      );
-      showToast('✅ تم نسخ الكود — افتح K12NET والصقه!');
-
+      showToast('📋 تم نسخ الكود! توجه الآن إلى K12NET والصقه في Console.');
       setTimeout(function() {
-        window.open('https://nsis.edu.gov.qa/GBJS.Web/#/score/1', '_blank');
-      }, 800);
+        openK12NET();
+      }, 1000);
+    } else {
+      showToast('❌ فشل النسخ التلقائي. يرجى المحاولة مرة أخرى.');
     }
   });
 }
 
-// ============================================================
-// Open K12NET
-// ============================================================
+// Open K12NET platform in a new blank tab
 function openK12NET() {
   window.open('https://nsis.edu.gov.qa/GBJS.Web/#/score/1', '_blank');
 }
 
-// ============================================================
-// Clipboard Helper
-// ============================================================
+// Clipboard copying wrapper
 function copyToClipboard(text, cb) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(function() {
@@ -1146,6 +1350,7 @@ function copyToClipboard(text, cb) {
   }
 }
 
+// Fallback method for clipboard writing
 function fallbackCopy(text, cb) {
   var ta = document.createElement('textarea');
   ta.value = text;
@@ -1161,8 +1366,6 @@ function fallbackCopy(text, cb) {
   }
   document.body.removeChild(ta);
 }
-
-// الأداة مفعلة بالكامل ونشطة دائماً
 </script>
 </body>
 </html>
