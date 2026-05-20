@@ -1,6 +1,6 @@
 # أداة رصد الدرجات التلقائي | Grade Tool
 
-A browser-based tool for automatically tracking and managing student grades, designed for Qatar schools using the NSIS (K12NET) platform.
+A browser-based tool for automatically tracking and managing student grades, designed for Qatar schools using the NSIS platform.
 
 ## Live App
 
@@ -8,7 +8,7 @@ A browser-based tool for automatically tracking and managing student grades, des
 
 ## Features
 
-- Import grades directly from K12NET (NSIS) Excel exports
+- Import grades directly from NSIS Excel exports
 - Automatic grade calculation and sorting
 - Arabic RTL interface with Lusail font
 - Works entirely in the browser — no installation required
@@ -22,7 +22,7 @@ A step-by-step Arabic guide is available in the [`infographic/`](infographic/) f
 ## Usage
 
 1. Open the [live app](https://math37851.github.io/grade-tool-nsis/)
-2. Upload your Excel file exported from K12NET
+2. Upload your Excel file exported from NSIS
 3. Review and export the processed grades
 
 ## Tech Stack
