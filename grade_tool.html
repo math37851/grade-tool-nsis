@@ -881,13 +881,13 @@
 </div>
 
 <!-- SheetJS Library for parsing Excel -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
 // ============================================================
 // State Management
 // ============================================================
-var gradeData = {};
+var gradeData = Object.create(null);
 var previewRowsList = [];
 var injectionScript = '';
 var selectedMode = 'auto'; // 'auto' | 'manual'
@@ -1052,7 +1052,7 @@ function parseExcelFile(file, callback) {
       var nameColIndex = 0;
       var gradeColIndex = 1;
 
-      gradeData = {};
+      gradeData = Object.create(null);
       var parsedRows = [];
 
       for (var i = dataStartRow; i < rows.length; i++) {
@@ -1088,7 +1088,7 @@ function buildInjectionScript() {
 
   var s = [];
   s.push('(function() {');
-  s.push('  var gradeMap = ' + gradeDataStr + ';');
+  s.push('  var gradeMap = Object.assign(Object.create(null), ' + gradeDataStr + ');');
   s.push('  if (!window.location.href.includes("nsis.edu.gov.qa")) {');
   s.push('    alert("⚠️ هذا الكود يجب تشغيله على صفحة رصد NSIS!\\nhttps://nsis.edu.gov.qa/GBJS.Web/#/score/1");');
   s.push('    return;');
@@ -1186,9 +1186,15 @@ function renderPreviewTable(rows) {
 
     var tdGrade = document.createElement('td');
     if (r.grade !== null) {
-      tdGrade.innerHTML = '<span class="grade-badge">' + r.grade + '</span>';
+      var badge = document.createElement('span');
+      badge.className = 'grade-badge';
+      badge.textContent = r.grade;
+      tdGrade.appendChild(badge);
     } else {
-      tdGrade.innerHTML = '<span class="no-grade-badge">—</span>';
+      var noBadge = document.createElement('span');
+      noBadge.className = 'no-grade-badge';
+      noBadge.textContent = '—';
+      tdGrade.appendChild(noBadge);
     }
     tr.appendChild(tdGrade);
 
