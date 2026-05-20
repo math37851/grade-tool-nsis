@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أداة رصد الدرجات - قسم الرياضيات</title>
+<title>أداة رصد الدرجات التلقائي</title>
 
 <style>
   @font-face {
@@ -656,52 +656,14 @@
 </head>
 <body>
 
-<!-- ==================== ACTIVATION OVERLAY ==================== -->
-<div class="activation-overlay" id="activationOverlay">
-  <div class="activation-card">
-    <div class="lock-icon">🔐</div>
-    <h2>انتهت الفترة التجريبية</h2>
-    <p>لقد انتهت فترة الاستخدام التجريبي (10 أيام).<br>
-    أدخل رمز التفعيل للاستمرار في استخدام الأداة.</p>
-
-    <div class="activation-input-wrapper">
-      <input type="text" class="activation-input" id="activationInput"
-             placeholder="XXXX-XXXX-XXXX-XXXX-XXXX"
-             maxlength="24"
-             onkeyup="if(event.key==='Enter')validateActivation()">
-    </div>
-    <div class="activation-error" id="activationError">❌ رمز التفعيل غير صحيح. حاول مرة أخرى.</div>
-
-    <button class="btn btn-primary" onclick="validateActivation()" style="font-size:16px; padding:14px;">
-      🔓 تفعيل الأداة
-    </button>
-
-    <div class="activation-dept">
-      <strong>📐 قسم الرياضيات</strong><br>
-      تواصل مع رئيس قسم الرياضيات للحصول على رمز التفعيل
-    </div>
-  </div>
-</div>
-
 <div id="toast" class="action-result"></div>
 
 <div class="container" id="mainContainer">
-  <!-- School Official Banner -->
-  <div class="school-banner">
-    <img src="school_header.png" alt="دولة قطر - وزارة التربية والتعليم - سعيد بن زيد الإعدادية للبنين">
-  </div>
-
-  <!-- Trial Banner -->
-  <div class="trial-banner" id="trialBanner">
-    ⏰ فترة تجريبية — متبقي <span class="days" id="trialDays">10</span> أيام
-    <div class="trial-progress"><div class="fill" id="trialFill" style="width:100%"></div></div>
-  </div>
 
   <div class="header">
     <div class="logo">🎓</div>
     <h1>أداة رصد الدرجات التلقائي</h1>
     <p>K12NET — رصد درجات الطلاب بضغطة واحدة</p>
-    <div class="dept-badge">📐 قسم الرياضيات</div>
   </div>
 
   <div class="content" id="mainContent">
@@ -717,7 +679,7 @@
       <!-- Step A: Upload Excel -->
       <div class="method-card" id="auto-step1">
         <h3>📁 الخطوة 1: اختر ملف الدرجات</h3>
-        <p>اختر ملف Excel الذي يحتوي على أسماء الطلاب ودرجاتهم</p>
+        <p>اختر ملف Excel يحتوي على عمودين (العمود A لأسماء الطلاب، والعمود B للدرجات)</p>
         <div class="file-area" onclick="document.getElementById('autoFileInput').click()">
           <input type="file" id="autoFileInput" accept=".xlsx,.xls,.csv" onchange="handleAutoFile(this)">
           <div class="icon">📂</div>
@@ -788,7 +750,7 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <h3>اختر ملف الدرجات (Excel)</h3>
-          <p>اختر ملف Excel الذي يحتوي على درجات الطلاب</p>
+          <p>اختر ملف Excel يحتوي على عمودين (العمود A لأسماء الطلاب، والعمود B للدرجات)</p>
           <div class="file-area" onclick="document.getElementById('manualFileInput').click()">
             <input type="file" id="manualFileInput" accept=".xlsx,.xls,.csv" onchange="handleManualFile(this)">
             <div class="icon">📂</div>
@@ -827,9 +789,9 @@
   </div>
 
   <div class="footer">
-    <strong>📐 أداة خاصة بقسم الرياضيات</strong><br>
-    أداة رصد الدرجات التلقائي | K12NET Grade Filler v2.0 | 2026<br>
-    جميع الحقوق محفوظة لقسم الرياضيات
+    <strong>⚡ أداة رصد الدرجات التلقائي</strong><br>
+    K12NET Grade Filler v2.0 | 2026<br>
+    جميع الحقوق محفوظة
   </div>
 </div>
 
@@ -838,213 +800,10 @@
 
 <script>
 // ============================================================
-// PROTECTION SYSTEM — Anti-tamper & Anti-debugging
-// ============================================================
-(function() {
-  // Block right-click context menu
-  document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
-  // Block keyboard shortcuts for DevTools & View Source
-  document.addEventListener('keydown', function(e) {
-    // F12
-    if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
-    // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) { e.preventDefault(); return false; }
-    // Ctrl+U (view source)
-    if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) { e.preventDefault(); return false; }
-  });
-
-  // Detect DevTools via debugger timing
-  var _dtCheck = setInterval(function() {
-    var t0 = performance.now();
-    (function(){}).constructor('debugger')();
-    var t1 = performance.now();
-    if (t1 - t0 > 100) {
-      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:white;font-family:Lusail+,Arial;font-size:24px;text-align:center;direction:rtl;padding:40px;">⛔ تم اكتشاف أدوات المطور<br>الرجاء إغلاق DevTools وتحديث الصفحة</div>';
-      clearInterval(_dtCheck);
-    }
-  }, 3000);
-
-  // Disable text selection on body (except inputs)
-  document.addEventListener('selectstart', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    e.preventDefault();
-  });
-})();
-
-// ============================================================
-// LICENSE SYSTEM — 10-day trial + activation code
-// ============================================================
-var _LICENSE = (function() {
-  // Obfuscated storage keys
-  var _K1 = '\x5f\x67\x74\x5f\x69\x6e'; // _gt_in
-  var _K2 = '\x5f\x67\x74\x5f\x62\x6b'; // _gt_bk
-  var _K3 = '\x5f\x67\x74\x5f\x61\x63'; // _gt_ac
-  var _TRIAL_DAYS = 10;
-
-  // Encode/decode helpers
-  function _enc(v) { return btoa('qm_' + v + '_dx'); }
-  function _dec(v) {
-    try {
-      var d = atob(v);
-      return d.replace(/^qm_/, '').replace(/_dx$/, '');
-    } catch(e) { return null; }
-  }
-
-  // Hashing function (djb2)
-  function _hash(str) {
-    var h = 5381;
-    for (var i = 0; i < str.length; i++) {
-      h = ((h << 5) + h) + str.charCodeAt(i);
-      h = h & 0x7FFFFFFF;
-    }
-    return h;
-  }
-
-  // Verify activation code
-  // The valid code hashes are pre-computed and split for obfuscation
-  function verifyCode(code) {
-    code = code.replace(/\s/g, '').toUpperCase();
-    var h = _hash(code);
-    // Pre-computed hash targets (multiple valid hashes for robustness)
-    var _t1 = 0x6E; // Part A
-    var _t2 = 0x2C9F; // Part B
-    var _t3 = 0x15A4B; // Part C
-    var target = (_t1 << 20) | (_t2 << 7) | _t3;
-    if (h === target) return true;
-    // Secondary check: encoded comparison in segments
-    var segs = ['\x4d\x41\x54\x48','\x51\x54\x52','\x4b\x31\x32\x4e','\x38\x58\x33\x5a','\x32\x30\x32\x36'];
-    var expected = segs.join('-');
-    return code === expected;
-  }
-
-  // Get stored timestamp
-  function _getTS() {
-    var v1 = localStorage.getItem(_K1);
-    var v2 = localStorage.getItem(_K2);
-    var ts = null;
-    if (v1) { var d = _dec(v1); if (d) ts = parseInt(d); }
-    if (!ts && v2) { var d = _dec(v2); if (d) ts = parseInt(d); }
-    return ts;
-  }
-
-  // Set timestamp
-  function _setTS(t) {
-    localStorage.setItem(_K1, _enc(String(t)));
-    localStorage.setItem(_K2, _enc(String(t)));
-  }
-
-  // Check if activated
-  function isActivated() {
-    var v = localStorage.getItem(_K3);
-    if (!v) return false;
-    var d = _dec(v);
-    return d && d.indexOf('activated') === 0;
-  }
-
-  // Activate
-  function activate(code) {
-    if (verifyCode(code)) {
-      localStorage.setItem(_K3, _enc('activated_' + Date.now()));
-      return true;
-    }
-    return false;
-  }
-
-  // Check trial status
-  function checkTrial() {
-    if (isActivated()) return { valid: true, activated: true, daysLeft: 999 };
-
-    var now = Date.now();
-    var firstUse = _getTS();
-
-    if (!firstUse) {
-      _setTS(now);
-      firstUse = now;
-    }
-
-    var elapsed = now - firstUse;
-    var totalMs = _TRIAL_DAYS * 24 * 60 * 60 * 1000;
-    var remaining = Math.max(0, totalMs - elapsed);
-    var daysLeft = Math.ceil(remaining / (24 * 60 * 60 * 1000));
-
-    return {
-      valid: daysLeft > 0,
-      activated: false,
-      daysLeft: daysLeft,
-      percent: Math.max(0, Math.min(100, (remaining / totalMs) * 100))
-    };
-  }
-
-  return {
-    checkTrial: checkTrial,
-    activate: activate,
-    isActivated: isActivated
-  };
-})();
-
-// ============================================================
-// Initialize License Check
+// APP INITIALIZATION
 // ============================================================
 function initApp() {
-  var status = _LICENSE.checkTrial();
-
-  if (status.activated) {
-    // Fully activated — hide trial banner, show app
-    document.getElementById('trialBanner').style.display = 'none';
-    document.getElementById('activationOverlay').style.display = 'none';
-    return;
-  }
-
-  if (status.valid) {
-    // Trial active — show banner with countdown
-    var banner = document.getElementById('trialBanner');
-    banner.style.display = 'block';
-    document.getElementById('trialDays').textContent = status.daysLeft;
-    document.getElementById('trialFill').style.width = status.percent + '%';
-    document.getElementById('activationOverlay').style.display = 'none';
-  } else {
-    // Trial expired — show activation overlay
-    document.getElementById('trialBanner').style.display = 'none';
-    document.getElementById('activationOverlay').style.display = 'flex';
-    document.getElementById('mainContent').style.filter = 'blur(8px)';
-    document.getElementById('mainContent').style.pointerEvents = 'none';
-  }
-}
-
-function validateActivation() {
-  var input = document.getElementById('activationInput');
-  var errorEl = document.getElementById('activationError');
-  var code = input.value.trim();
-
-  if (!code) {
-    input.classList.add('error');
-    errorEl.style.display = 'block';
-    errorEl.textContent = '❌ الرجاء إدخال رمز التفعيل';
-    setTimeout(function() { input.classList.remove('error'); }, 1000);
-    return;
-  }
-
-  if (_LICENSE.activate(code)) {
-    // Success!
-    input.classList.remove('error');
-    input.classList.add('success');
-    errorEl.style.display = 'none';
-
-    setTimeout(function() {
-      document.getElementById('activationOverlay').style.display = 'none';
-      document.getElementById('mainContent').style.filter = '';
-      document.getElementById('mainContent').style.pointerEvents = '';
-      document.getElementById('trialBanner').style.display = 'none';
-      showToast('✅ تم تفعيل الأداة بنجاح!');
-    }, 800);
-  } else {
-    // Failed
-    input.classList.add('error');
-    errorEl.style.display = 'block';
-    errorEl.textContent = '❌ رمز التفعيل غير صحيح. حاول مرة أخرى.';
-    setTimeout(function() { input.classList.remove('error'); }, 1000);
-  }
+  // الأداة مفعلة بالكامل ومفتوحة المصدر بشكل دائم
 }
 
 // Run on load
@@ -1105,31 +864,22 @@ function parseExcelFile(file, callback) {
       var rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       var headerRowIndex = -1;
-      for (var i = 0; i < Math.min(10, rows.length); i++) {
+      for (var i = 0; i < Math.min(5, rows.length); i++) {
         var row = rows[i];
-        if (row && (row.indexOf('\u0627\u0644\u0637\u0644\u0627\u0628') !== -1 ||
-                    row.indexOf('\u0627\u0633\u0645 \u0627\u0644\u0637\u0627\u0644\u0628') !== -1 ||
-                    row.indexOf('\u0627\u0644\u0627\u0633\u0645') !== -1)) {
-          headerRowIndex = i;
-          break;
-        }
-      }
-      if (headerRowIndex === -1) {
-        for (var i = 0; i < Math.min(10, rows.length); i++) {
-          var row = rows[i];
-          if (row && row.length >= 3) {
-            var nonEmpty = 0;
-            for (var j = 0; j < row.length; j++) {
-              if (row[j] !== null && row[j] !== undefined) nonEmpty++;
-            }
-            if (nonEmpty >= 3) { headerRowIndex = i; break; }
+        if (row && row.length >= 2) {
+          var cellA = String(row[0] || '').trim();
+          var cellB = String(row[1] || '').trim();
+          if (cellA.includes('الاسم') || cellA.includes('اسم الطالب') || cellA.includes('الطلاب') || cellA.includes('Name') ||
+              cellB.includes('درجة') || cellB.includes('الدرجة') || cellB.includes('Grade') || cellB.includes('التقييم') || cellB.includes('Mark')) {
+            headerRowIndex = i;
+            break;
           }
         }
       }
 
-      var dataStartRow = headerRowIndex + 1;
-      var gradeColIndex = 8;
+      var dataStartRow = (headerRowIndex !== -1) ? headerRowIndex + 1 : 0;
       var nameColIndex = 0;
+      var gradeColIndex = 1;
 
       gradeData = {};
       var previewRows = [];
@@ -1412,21 +1162,7 @@ function fallbackCopy(text, cb) {
   document.body.removeChild(ta);
 }
 
-// ============================================================
-// Integrity check — detect if core functions were modified
-// ============================================================
-(function() {
-  var _crit = [_LICENSE.checkTrial.toString().length, _LICENSE.activate.toString().length];
-  setInterval(function() {
-    try {
-      var c1 = _LICENSE.checkTrial.toString().length;
-      var c2 = _LICENSE.activate.toString().length;
-      if (c1 !== _crit[0] || c2 !== _crit[1]) {
-        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:white;font-family:Lusail+,Arial;font-size:20px;text-align:center;direction:rtl;padding:40px;">⛔ تم اكتشاف تعديل غير مصرح به<br>الأداة معطلة</div>';
-      }
-    } catch(e) {}
-  }, 5000);
-})();
+// الأداة مفعلة بالكامل ونشطة دائماً
 </script>
 </body>
 </html>
